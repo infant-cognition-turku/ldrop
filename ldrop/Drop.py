@@ -48,11 +48,16 @@ class DropController(EventEmitter):
         self.pluginmanager.collectPlugins()
         self.gui = None
 
+        self.experiment_id = None
+        self.play_callback = None
+        self.stop_callback = None
+        self.continue_callback = None
+
     def input_parameters(self, experiment_id, play_callback,
-                         pause_callback, continue_callback):
+                         stop_callback, continue_callback):
         self.experiment_id = experiment_id
         self.play_callback = play_callback
-        self.pause_callback = pause_callback
+        self.stop_callback = stop_callback
         self.continue_callback = continue_callback
 
     def start_gui(self):
@@ -126,9 +131,8 @@ class DropController(EventEmitter):
         for sensor in self.sensors:
             sensor.clear_data_conditions()
 
-        # self.emit("continue")
-        if self.experiment is not None:
-            self.experiment.next_phase()
+        if self.continue_callback is not None:
+            self.continue_callback()
 
     def stop(self):
         """Callback for stopbutton click."""
@@ -139,8 +143,6 @@ class DropController(EventEmitter):
         model.on("tag", self.on_tag)
         model.on("data_condition_added", self.on_data_condition_added)
         model.on("data_condition_met", self.continue_experiment)
-#        model.on("trial_completed", self.on_trial_completed)
-#        model.on("trial_started", self.on_trial_started)
 
 #    def on_trial_started(self, tn, tc):
 #        """Callback for trial_started signal."""
@@ -184,25 +186,7 @@ class DropController(EventEmitter):
                    "timestamp": self.timestamp()}
             self.on_tag("tag", tag)
 
-#    def experiment_start(self, debug):
-#        """Method to start experiment."""
-        # load experiment data from JSON-dictlist
-#        experiment_data = self.get_experiment_information()
-
-        # initialize the experiment object, resolution is here taken from
-        # the first section of the experiment (assuming experiment not empty).
-#        from ExperimentPsychopyView import ExperimentPsychopyView
-#        resolution = experiment_data[0]["resolution"]
-#        bgcolor = experiment_data[0]["bgcolor"]
-#        position = experiment_data[0]["position"]
-#        self.exp_view = ExperimentPsychopyView(debug, resolution, bgcolor,
-#                                               position)
-#        self.experiment = Experiment([self.exp_view, self.ec.trackstatus],
-#                                     self, experiment_data,
-#                                     self.experiment_file, self.mediadir,
-#                                     self.on_experiment_completed)
-#
-## TODO: kommunikaatiorajapinta experimentin suuntaan sensoreilta as follow->    
+## TODO: communication api sensor->experiment mby as follows->    
 #
 #        for r in self.sensors:
 #            self.exp_view.add_model(r)
@@ -214,10 +198,8 @@ class DropController(EventEmitter):
         # clear view references
         for r in self.sensors:
             self.exp_view.remove_model(r)
-        self.exp_view = None
+        #self.exp_view = None
 
-        # clear experiment object pointer
-        self.experiment = None
 
     def on_data_condition_added(self, data_condition):
         """Callback for data_condition_added. Singal datacond. to sensors."""
