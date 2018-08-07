@@ -27,39 +27,24 @@ class Sensor(EventEmitter):
         rndnum = random.randint(0, 100000)
         self.sensor_id = "sensor" + str(rndnum)
 
-    def trial_started(self, tn, tc):
-        """
-        Function is called when the trial is started.
-
-        Parameters:
-        tn: trial number (int)
-        tc: trial count (int)
-        """
-        return False
-
-    def trial_completed(self, name, tn, tc, misc):
-        """Method that is called when trial is completed."""
-        return False
-
-    def tag(self, tag):
-        """Method that is called when a new tag arrives."""
-        print "FUNCTION NOT IMPLEMENTED"
-
     def action(self, action_id):
         """Perform actions for the control elements defined."""
+        return False
+
+    def clear_data_conditions(self):
+        """Clear existing data conditions."""
+        self.data_conditions = []
+
+    def disconnect(self):
+        """Method that is called when sensor is disconnected."""
+        #TODO: integrate to destructor
+        self.emit("clear_screen")
+        self.remove_all_listeners()
         return False
 
     def get_type(self):
         """Return sensor type."""
         return self.type
-
-    def set_data_condition(self, condition):
-        """Insert new data condition."""
-        self.data_conditions.append(condition)
-
-    def clear_data_conditions(self):
-        """Clear existing data conditions."""
-        self.data_conditions = []
 
     def get_sensor_id(self):
         """Return sensor-id-string."""
@@ -69,20 +54,22 @@ class Sensor(EventEmitter):
         """Return the list of sensors control-elements."""
         return self.control_elements
 
-    def stop_recording(self):
-        """Method that stops the sensor recording."""
-        print "FUNCTION NOT IMPLEMENTED"
+    def set_data_condition(self, condition):
+        """Insert new data condition."""
+        self.data_conditions.append(condition)
 
     def start_recording(self, rootdir, participant_id, experiment_file,
                         section_id):
         """Method that starts sensor recording."""
         print "FUNCTION NOT IMPLEMENTED"
 
-    def disconnect(self):
-        """Method that is called when sensor is disconnected."""
-        self.emit("clear_screen")
-        self.remove_all_listeners()
-        return False
+    def stop_recording(self):
+        """Method that stops the sensor recording."""
+        print "FUNCTION NOT IMPLEMENTED"
+
+    def tag(self, tag):
+        """Method that is called when a new tag arrives."""
+        print "FUNCTION NOT IMPLEMENTED"
 
     def __del__(self):
         """Destructor."""
