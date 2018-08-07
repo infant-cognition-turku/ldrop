@@ -15,9 +15,8 @@ class DPV:
         """Constructor."""
         # view knows the controller function calls
         self.ctrl = ctrl
-        self.ctrl.on("section_completed", self.on_section_completed)
-        self.ctrl.on("trial_completed", self.on_trial_completed)
         self.ctrl.on("sensorcount_changed", self.on_sensors_changed)
+        self.ctrl.on("log_update", self.on_log_update)
         self.ctrl.on("error", self.on_error)
 
         self.savedir = savedir
@@ -33,32 +32,21 @@ class DPV:
         self.addsensorbutton.connect("clicked",
                                      self.on_addsensorbutton_clicked)
 
-        # experiment status treeview
-        self.liststore_status = gtk.ListStore(str, str, str)
-        self.treeview_status = gtk.TreeView(self.liststore_status)
+        # log list
+        self.liststore_log = gtk.ListStore(str)
+        self.treeview_log = gtk.TreeView(self.liststore_log)
 
-        self.section_column = gtk.TreeViewColumn("Section")
-        self.section_cell = gtk.CellRendererText()
-        self.treeview_status.append_column(self.section_column)
-        self.section_column.pack_start(self.section_cell, True)
-        self.section_column.set_attributes(self.section_cell, text=0)
+        self.log_column = gtk.TreeViewColumn("Log")
+        self.log_cell = gtk.CellRendererText()
+        self.treeview_log.append_column(self.log_column)
+        self.log_column.pack_start(self.log_cell, True)
+        self.log_column.set_attributes(self.log_cell, text=0)
 
-        self.trial_column = gtk.TreeViewColumn("Trial")
-        self.trial_cell = gtk.CellRendererText()
-        self.treeview_status.append_column(self.trial_column)
-        self.trial_column.pack_start(self.trial_cell, True)
-        self.trial_column.set_attributes(self.trial_cell, text=1)
-
-        self.misc_column = gtk.TreeViewColumn("Misc")
-        self.misc_cell = gtk.CellRendererText()
-        self.treeview_status.append_column(self.misc_column)
-        self.misc_column.pack_start(self.misc_cell, True)
-        self.misc_column.set_attributes(self.misc_cell, text=2)
-
+        # scrollable container
         self.scrol_tree_status = gtk.ScrolledWindow()
         self.scrol_tree_status.set_policy(gtk.POLICY_NEVER,
                                           gtk.POLICY_AUTOMATIC)
-        self.scrol_tree_status.add(self.treeview_status)
+        self.scrol_tree_status.add(self.treeview_log)
 
         self.trackstatus = ExperimentStatusView(self)
 
@@ -148,30 +136,6 @@ class DPV:
         self.show_message_box("Error: " + errormsg, "Drop error",
                               ("Ok", gtk.RESPONSE_OK), [None], [None])
 
-    def on_section_completed(self, csection, lensection):
-        """Callback for section_completed-signal."""
-        if csection + 1 != lensection:
-            self.show_message_box("Section " + str(csection + 1) + "/" +
-                                  str(lensection) + " finished.",
-                                  "Section finished.",
-                                  ("Continue to next section", gtk.RESPONSE_OK,
-                                   "Rerun previous section",
-                                   gtk.RESPONSE_REJECT, "Abort experiment",
-                                   gtk.RESPONSE_CLOSE),
-                                  [self.ctrl.start_section,
-                                   self.ctrl.start_section,
-                                   self.ctrl.start_section],
-                                  [csection+1, csection, lensection])
-        else:
-            self.show_message_box("Section " + str(csection + 1) + "/" +
-                                  str(lensection) + " finished.",
-                                  "Section finished.",
-                                  ("End experiment", gtk.RESPONSE_CLOSE,
-                                   "Rerun previous section",
-                                   gtk.RESPONSE_REJECT),
-                                  [self.ctrl.start_section,
-                                   self.ctrl.start_section],
-                                  [lensection, csection])
 
     def clear_log(self):
         """Callback for experiment_started-signal."""
@@ -232,15 +196,15 @@ class DPV:
     def on_id_changed(self, widget):
         """Id-change callback-function."""
         self.ctrl.set_participant_id(widget.get_text())
-        self.check_experiment_start_conditions()
+        self.check_play_conditions()
 
     def on_gui_action(self, editable):
         """Callback for change in gui that affects exp start conditions."""
-        self.check_experiment_start_conditions()
+        self.check_play_conditions()
 
     def on_sensors_changed(self):
         """Callback for sensors_changed_signal."""
-        self.check_experiment_start_conditions()
+        self.check_play_conditions()
         return False
 
     def on_playbutton_clicked(self, button):
@@ -256,16 +220,16 @@ class DPV:
         """Callback for stopbutton click."""
         self.ctrl.stop()
 
-    def on_trial_completed(self, section, tn, misc):
+    def on_log_update(self, logentry):
         """Callback for trial completion during experiment."""
         # append status value to listview
-        self.liststore_status.append(('%s' % section, tn, misc))
+        self.liststore_log.append([str(logentry)])
 
         # hop down to see the last value added
         adj = self.scrol_tree_status.get_vadjustment()
         adj.set_value(adj.upper-adj.page_size)
 
-    def check_experiment_start_conditions(self):
+    def check_play_conditions(self):
         """Check all prequisities running experiment met. Activate buttons."""
         # participant id
         id_code = self.ctrl.get_participant_id()

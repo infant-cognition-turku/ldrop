@@ -21,6 +21,7 @@ class DropController(EventEmitter):
 
         # Model initialization code
         self.sensors = []
+        self.tags = []
 
         # define important directories for external (not program code) files
         homedir = os.environ["HOME"]
@@ -176,6 +177,10 @@ class DropController(EventEmitter):
         for sensor in self.sensors:
             # send a copy of the dict to each sensor
             sensor.tag(tag.copy())
+
+#        self.tags.append(tag)
+        self.emit("log_update", tag.copy())
+        
 
     def on_keypress(self, keyname):
         """Callback for keypress."""
