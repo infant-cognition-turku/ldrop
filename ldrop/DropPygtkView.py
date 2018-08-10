@@ -5,7 +5,7 @@ import gtk
 import utils
 import pango
 import glib
-from ExperimentStatusView import ExperimentStatusView
+from SensorStatusView import StatusView
 
 
 class DPV:
@@ -48,7 +48,7 @@ class DPV:
                                           gtk.POLICY_AUTOMATIC)
         self.scrol_tree_status.add(self.treeview_log)
 
-        self.trackstatus = ExperimentStatusView(self)
+        self.trackstatus = StatusView(self)
 
         self.idlabel = gtk.Label("Participant id")
         self.continuebutton = gtk.Button(label="Continue")

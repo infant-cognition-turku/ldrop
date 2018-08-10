@@ -1,4 +1,4 @@
-"""ExperimentStatusView-class."""
+"""SensorStatusView-class."""
 
 import gtk
 import cairo
@@ -7,8 +7,8 @@ import glib
 import utils
 
 
-class ExperimentStatusView(gtk.DrawingArea):
-    """A view for experiment that provides information to the observer."""
+class StatusView(gtk.DrawingArea):
+    """A view for sensor for displaying status information during recording."""
 
     def __init__(self, controller):
         """Constructor."""

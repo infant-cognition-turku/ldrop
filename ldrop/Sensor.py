@@ -61,17 +61,17 @@ class Sensor(EventEmitter):
     def start_recording(self, rootdir, participant_id, experiment_file,
                         section_id):
         """Method that starts sensor recording."""
-        print "FUNCTION NOT IMPLEMENTED"
+        print("FUNCTION NOT IMPLEMENTED")
 
     def stop_recording(self):
         """Method that stops the sensor recording."""
-        print "FUNCTION NOT IMPLEMENTED"
+        print("FUNCTION NOT IMPLEMENTED")
 
     def tag(self, tag):
         """Method that is called when a new tag arrives."""
-        print "FUNCTION NOT IMPLEMENTED"
+        print("FUNCTION NOT IMPLEMENTED")
 
     def __del__(self):
         """Destructor."""
-        print self.sensor_id + " disconnected."
+        print(self.sensor_id + " disconnected.")
         return False
