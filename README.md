@@ -2,11 +2,16 @@
 Data recording sensor api and gui.
 
 ### What is ldrop?
-ldrop is a more open version of drop that does not require any predefined structure for the experiment.
-ldrop is aiming to be a library which gives the user a sensor-API to be easily used with their own scripts.
+ldrop is a more open version of drop that does not require any predefined
+structure for the experiment. ldrop is aiming to be a library which provides 
+user a sensor-API to be easily used with their own scripts.
+
+### System requirements
+ldrop is not platform dependend by nature. However we use Linux because python
+is easiest to use on Linux.
 
 ### How to use ldrop?
-Probably API design is not final.
+[API design not final]
 ```
 import Drop
 exp = MyExperiment()
