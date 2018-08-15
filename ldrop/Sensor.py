@@ -21,7 +21,6 @@ class Sensor(EventEmitter):
         EventEmitter.__init__(self)
         self.type = None
         self.control_elements = []
-        self.data_conditions = []
 
         # sensor_id should be unique
         rndnum = random.randint(0, 100000)
@@ -30,10 +29,6 @@ class Sensor(EventEmitter):
     def action(self, action_id):
         """Perform actions for the control elements defined."""
         return False
-
-    def clear_data_conditions(self):
-        """Clear existing data conditions."""
-        self.data_conditions = []
 
     def disconnect(self):
         """Method that is called when sensor is disconnected."""
@@ -54,12 +49,7 @@ class Sensor(EventEmitter):
         """Return the list of sensors control-elements."""
         return self.control_elements
 
-    def set_data_condition(self, condition):
-        """Insert new data condition."""
-        self.data_conditions.append(condition)
-
-    def start_recording(self, rootdir, participant_id, experiment_file,
-                        section_id):
+    def start_recording(self, rootdir, participant_id, savefilename):
         """Method that starts sensor recording."""
         print("FUNCTION NOT IMPLEMENTED")
 

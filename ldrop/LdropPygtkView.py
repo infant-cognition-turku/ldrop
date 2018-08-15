@@ -8,7 +8,7 @@ import glib
 from SensorStatusView import StatusView
 
 
-class DPV:
+class LDPV:
     """A pygtk-view for drop controller."""
 
     def __init__(self, ctrl, savedir):

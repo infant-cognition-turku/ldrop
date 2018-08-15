@@ -6,7 +6,7 @@ import time
 import glib
 import utils
 from pyee import EventEmitter
-from DropPygtkView import DPV
+from LdropPygtkView import LDPV
 from yapsy.PluginManager import PluginManager
 from plugins import DropPluginLocator
 
@@ -25,11 +25,11 @@ class DropController(EventEmitter):
 
         # define important directories for external (not program code) files
         homedir = os.environ["HOME"]
-        drop_home = os.path.join(homedir, "Documents", "drop_data")
-        self.rootdir = drop_home
-        self.plugindir = os.path.join(drop_home, "plugins")
-        self.dependenciesdir = os.path.join(drop_home, "dependencies")
-        self.savedir = os.path.join(drop_home, "recordings")
+        ldrop_home = os.path.join(homedir, "Documents", "ldrop_data")
+        self.rootdir = ldrop_home
+        self.plugindir = os.path.join(ldrop_home, "plugins")
+        self.dependenciesdir = os.path.join(ldrop_home, "dependencies")
+        self.savedir = os.path.join(ldrop_home, "recordings")
 
         # check that saving, experiment etc directories are present
         utils.dircheck(self.savedir)
@@ -54,16 +54,19 @@ class DropController(EventEmitter):
         self.stop_callback = None
         self.continue_callback = None
 
-    def input_parameters(self, experiment_id, play_callback,
-                         stop_callback, continue_callback):
+        self.participant_id = ""
+
+    def set_callbacks(self, experiment_id, play_callback, stop_callback,
+                         continue_callback, data_callback):
         self.experiment_id = experiment_id
         self.play_callback = play_callback
         self.stop_callback = stop_callback
         self.continue_callback = continue_callback
+        self.data_callback = data_callback
 
     def start_gui(self):
         # initialize pygtk-view
-        self.gui = DPV(self, self.savedir)
+        self.gui = LDPV(self, self.savedir)
         self.gui.main()
 
     def close_gui(self):
@@ -87,16 +90,16 @@ class DropController(EventEmitter):
         """Sensor error-handler."""
         self.emit("error", msg)
 
-    def on_sensor_created(self, rhandle):
+    def on_sensor_created(self, shandle):
         """Callback for sensor initialization."""
-        self.sensors.append(rhandle)
+        self.sensors.append(shandle)
 
         if self.gui is not None:
-            self.gui.add_sensor(rhandle)
+            self.gui.add_sensor(shandle)
         self.emit("sensorcount_changed")
 
         # add model to hear calls from sensors, such as data_condition met
-        self.add_model(rhandle)
+        self.add_model(shandle)
 
     def sensor_action(self, sensor_id, action_id):
         """Perform action that is listed on sensors control elements."""
@@ -142,20 +145,9 @@ class DropController(EventEmitter):
     def add_model(self, model):
         """Add a model to listen for."""
         model.on("tag", self.on_tag)
-        model.on("data_condition_added", self.on_data_condition_added)
-        model.on("data_condition_met", self.continue_experiment)
-
-#    def on_trial_started(self, tn, tc):
-#        """Callback for trial_started signal."""
-#        for r in self.sensors:
-#            r.trial_started(tn, tc)
-#
-#    def on_trial_completed(self, name, tn, tc, misc):
-#        """Callback for trial_completed signal."""
-#        self.emit("trial_completed", name, tn, misc)
-#
-#        for r in self.sensors:
-#            r.trial_completed(name, tn, tc, misc)
+        model.on("data", self.on_data)
+#        model.on("data_condition_added", self.on_data_condition_added)
+#        model.on("data_condition_met", self.continue_experiment)
 
     def timestamp(self):
         """Return a local timestamp in microsecond accuracy."""
@@ -181,7 +173,6 @@ class DropController(EventEmitter):
 #        self.tags.append(tag)
         self.emit("log_update", tag.copy())
         
-
     def on_keypress(self, keyname):
         """Callback for keypress."""
         if keyname in self.keyboard_contigency:
@@ -205,14 +196,17 @@ class DropController(EventEmitter):
             self.exp_view.remove_model(r)
         #self.exp_view = None
 
+#    def on_data_condition_added(self, data_condition):
+#        """Callback for data_condition_added. Singal datacond. to sensors."""
+#        if data_condition["type"] == "kb":
+#            self.keyboard_contigency += data_condition["keys"]
+#
+#        for sensor in self.sensors:
+#            sensor.set_data_condition(data_condition)
 
-    def on_data_condition_added(self, data_condition):
-        """Callback for data_condition_added. Singal datacond. to sensors."""
-        if data_condition["type"] == "kb":
-            self.keyboard_contigency += data_condition["keys"]
-
-        for sensor in self.sensors:
-            sensor.set_data_condition(data_condition)
+    def on_data(self, dp):
+        if self.data_callback is not None:
+            glib.idle_add(self.data_callback, dp)
 
     def start_collecting_data(self, section_id):
         """Function starts data collection on all sensors."""

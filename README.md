@@ -16,6 +16,7 @@ is easiest to use on Linux.
 import Drop
 exp = MyExperiment()
 ldrop = Drop.DropController()
-ldrop.input_parameters("myexp", exp.on_play_callback, exp.on_stop_callback, exp.on_continue_callback)
+ldrop.set_callbacks("myexp", exp.on_play, exp.on_stop, exp.on_continue, exp.on_data)
+exp.tag_callback = drop.on_tag
 ldrop.start_gui()
 ```
