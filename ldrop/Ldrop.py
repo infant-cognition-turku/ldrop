@@ -11,7 +11,7 @@ from yapsy.PluginManager import PluginManager
 from plugins import DropPluginLocator
 
 
-class DropController(EventEmitter):
+class Controller(EventEmitter):
     """Main controller of the class. Views+ui separated to different files."""
 
     def __init__(self):
@@ -56,6 +56,19 @@ class DropController(EventEmitter):
 
         self.participant_id = ""
 
+        ## TESTING glib mainloop on drop
+        ## -> then webserver and a webpage controller interface
+        ## issue: many mainloops cause of server?
+        glib.timeout_add(50, self.on_refresh)
+
+    def run(self):
+        ml = glib.MainLoop()
+        ml.run()
+
+    def on_refresh(self):
+        # here refreshment loop functions
+        glib.timeout_add(50, self.on_refresh)
+
     def set_callbacks(self, experiment_id, play_callback, stop_callback,
                          continue_callback, data_callback):
         self.experiment_id = experiment_id
@@ -64,10 +77,9 @@ class DropController(EventEmitter):
         self.continue_callback = continue_callback
         self.data_callback = data_callback
 
-    def start_gui(self):
+    def enable_gui(self):
         # initialize pygtk-view
         self.gui = LDPV(self, self.savedir)
-        self.gui.main()
 
     def close_gui(self):
         # clear gui reference

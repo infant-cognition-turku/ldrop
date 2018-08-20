@@ -130,6 +130,8 @@ class LDPV:
         self.window.add(self.table)
         self.window.show_all()
 
+        # Not exactly sure if this is needed or not
+        gtk.gdk.threads_init()
 
     def on_error(self, errormsg):
         """Callback for error-signal."""
@@ -242,14 +244,8 @@ class LDPV:
 
     def destroy(self, widget, data=None):
         """Class destroyer callback."""
-        gtk.main_quit()
         self.ctrl.close_gui()
         self.ctrl = None
-
-    def main(self):
-        """PyGTK application main loop or waiting function."""
-        gtk.gdk.threads_init()
-        gtk.main()
 
     def text_dialog(self, txt):
         """
