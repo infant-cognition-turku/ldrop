@@ -131,7 +131,7 @@ class LDPV:
         self.window.show_all()
 
         # Not exactly sure if this is needed or not
-        gtk.gdk.threads_init()
+        #gtk.gdk.threads_init()
 
     def on_error(self, errormsg):
         """Callback for error-signal."""

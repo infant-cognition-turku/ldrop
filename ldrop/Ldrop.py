@@ -69,9 +69,11 @@ class Controller(EventEmitter):
         # here refreshment loop functions
         glib.timeout_add(50, self.on_refresh)
 
-    def set_callbacks(self, experiment_id, play_callback, stop_callback,
+    def set_experiment_id(self, expid):
+        self.experiment_id = expid
+
+    def set_callbacks(self, play_callback, stop_callback,
                          continue_callback, data_callback):
-        self.experiment_id = experiment_id
         self.play_callback = play_callback
         self.stop_callback = stop_callback
         self.continue_callback = continue_callback
