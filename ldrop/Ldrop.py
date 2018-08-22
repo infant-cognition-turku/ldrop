@@ -53,6 +53,7 @@ class Controller(EventEmitter):
         self.play_callback = None
         self.stop_callback = None
         self.continue_callback = None
+        self.data_callback = None
 
         self.participant_id = ""
 

@@ -132,6 +132,14 @@ class LDPV:
 
         # Not exactly sure if this is needed or not
         #gtk.gdk.threads_init()
+        self.draw_sensors()
+
+    def draw_sensors(self):
+        sensors = self.ctrl.get_sensors()
+        
+        for s in sensors:
+            self.add_sensor(s)
+            self.trackstatus.add_model(s)
 
     def on_error(self, errormsg):
         """Callback for error-signal."""
@@ -175,7 +183,6 @@ class LDPV:
 
         self.sensors_vbox.pack_start(hvbox, expand=False)
         self.window.show_all()
-        self.trackstatus.add_model(shandle)
 
     def sensor_button_callback(self, button, device_id, button_id):
         """Callback for sensor_button pressed-signal."""
@@ -185,7 +192,6 @@ class LDPV:
         """Callback for the remove_sensor button(s). Parameter:buttonhandle."""
         self.ctrl.remove_sensor(device_id)
         self.sensors_vbox.remove(hvbox)
-
 
     def on_keypress(self, widget, event):
         """Keypress callback-function."""
