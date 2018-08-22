@@ -80,11 +80,11 @@ class Controller(EventEmitter):
         self.data_callback = data_callback
 
     def enable_gui(self):
-        # initialize pygtk-view
+        """ Initialize pygtk-view to be run when mainloop starts """
         self.gui = LDPV(self, self.savedir)
 
     def close_gui(self):
-        # clear gui reference
+        """ Clear gui reference """
         self.gui = None
 
     def addsensor(self, sensor_name):
@@ -99,6 +99,14 @@ class Controller(EventEmitter):
     def get_sensors(self):
         """Return list of sensors."""
         return self.sensors
+
+    def get_sensor_plugins(self):
+        plugins = self.pluginmanager.getAllPlugins()
+        sensornames = []
+        for p in plugins:
+            sensornames.append(p.name) #[p.name, p.description]
+
+        return sensornames
 
     def on_sensor_error(self, msg):
         """Sensor error-handler."""

@@ -18,7 +18,7 @@ exp = MyExperiment()
 ldrop = LDrop.DropController()
 ldrop.set_experiment_id("myexp")
 ldrop.set_callbacks(exp.on_play, exp.on_stop, exp.on_continue, exp.on_data)
-exp.tag_callback = drop.on_tag
+exp.tag_callback = ldrop.on_tag
 ldrop.enable_gui()
 ldrop.run()
 ```

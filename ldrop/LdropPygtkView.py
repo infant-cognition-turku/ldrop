@@ -138,7 +138,6 @@ class LDPV:
         self.show_message_box("Error: " + errormsg, "Drop error",
                               ("Ok", gtk.RESPONSE_OK), [None], [None])
 
-
     def clear_log(self):
         """Callback for experiment_started-signal."""
         # clear information about previous experiments rounds
@@ -152,10 +151,10 @@ class LDPV:
         """Callback for addeeg-button."""
         self.show_plugin_finder()
 
-    def add_sensor(self, rhandle):
+    def add_sensor(self, shandle):
         """Sensor addition involving gui creation."""
-        device_id = rhandle.get_sensor_id()
-        gui_elements = rhandle.get_control_elements()
+        device_id = shandle.get_sensor_id()
+        gui_elements = shandle.get_control_elements()
 
         hvbox = gtk.VBox(homogeneous=False, spacing=1)
         name = gtk.Label(device_id)
@@ -168,7 +167,7 @@ class LDPV:
 
         # input additional gui-elements
         for ge in gui_elements:
-            if ge["type"] == "button":
+            if ge["type"] ==  "button":
                 newbutton = gtk.Button(ge["id"])
                 newbutton.connect("clicked", self.sensor_button_callback,
                                   device_id, ge["id"])
@@ -176,7 +175,7 @@ class LDPV:
 
         self.sensors_vbox.pack_start(hvbox, expand=False)
         self.window.show_all()
-        self.trackstatus.add_model(rhandle)
+        self.trackstatus.add_model(shandle)
 
     def sensor_button_callback(self, button, device_id, button_id):
         """Callback for sensor_button pressed-signal."""
