@@ -15,8 +15,10 @@ is easiest to use on Linux.
 ```
 import Drop
 exp = MyExperiment()
-ldrop = Drop.DropController()
-ldrop.set_callbacks("myexp", exp.on_play, exp.on_stop, exp.on_continue, exp.on_data)
+ldrop = LDrop.DropController()
+ldrop.set_experiment_id("myexp")
+ldrop.set_callbacks(exp.on_play, exp.on_stop, exp.on_continue, exp.on_data)
 exp.tag_callback = drop.on_tag
-ldrop.start_gui()
+ldrop.enable_gui()
+ldrop.run()
 ```
