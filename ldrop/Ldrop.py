@@ -88,7 +88,7 @@ class Controller(EventEmitter):
         """ Clear gui reference """
         self.gui = None
 
-    def addsensor(self, sensor_name):
+    def add_sensor(self, sensor_name):
         """Callback for Add sensor -button."""
         # TODO: Improve APIs for plugins
         plugin_info = self.pluginmanager.getPluginByName(sensor_name)

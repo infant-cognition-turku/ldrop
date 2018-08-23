@@ -13,12 +13,28 @@ is easiest to use on Linux.
 ### How to use ldrop?
 [API design not final]
 ```
-import Drop
+import Ldrop
+
+# create instance of your experiment class
 exp = MyExperiment()
-ldrop = LDrop.DropController()
+
+# create instance of drop controller
+ldrop = Ldrop.DropController()
+
+# set parameters and callbacks for the controller to control experiment
 ldrop.set_experiment_id("myexp")
 ldrop.set_callbacks(exp.on_play, exp.on_stop, exp.on_continue, exp.on_data)
+
+# set callback to controller from experiment
 exp.tag_callback = ldrop.on_tag
+
+# add a sensor to record data during experiment run
+ldrop.add_sensor('null')
+
+# enable graphical user interface (optional)
 ldrop.enable_gui()
+
+# start drop mainloop
 ldrop.run()
 ```
+

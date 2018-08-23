@@ -377,7 +377,7 @@ class LDPV:
         dlg.vbox.pack_start(treeview)
         dlg.show_all()
         dlg.connect("response", on_plugin_finder_select, treeview,
-                    self.ctrl.addsensor)
+                    self.ctrl.add_sensor)
 
         # add plugins to liststore
         plugins = self.ctrl.pluginmanager.getAllPlugins()
