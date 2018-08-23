@@ -63,6 +63,11 @@ class Controller(EventEmitter):
         glib.timeout_add(50, self.on_refresh)
 
     def run(self):
+        # if no gui to control experiment is present, just start running the
+        # experiment
+        if self.gui is None and self.play_callback is not None:
+            self.play()
+    
         ml = glib.MainLoop()
         ml.run()
 
