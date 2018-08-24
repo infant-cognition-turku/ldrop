@@ -15,7 +15,8 @@ is easiest to use on Linux.
 ```
 import Ldrop
 
-# create instance of your experiment class
+# create instance of your experiment class (suggested to inherit
+# from pyee EventEmitter)
 exp = MyExperiment()
 
 # create instance of drop controller
@@ -25,8 +26,8 @@ ldrop = Ldrop.DropController()
 ldrop.set_experiment_id("myexp")
 ldrop.set_callbacks(exp.on_play, exp.on_stop, exp.on_continue, exp.on_data)
 
-# set callback to controller from experiment
-exp.tag_callback = ldrop.on_tag
+# ldrop to listen events emitted by experiment
+ldrop.add_model(exp)
 
 # add a sensor to record data during experiment run
 ldrop.add_sensor('null')
@@ -37,4 +38,3 @@ ldrop.enable_gui()
 # start drop mainloop
 ldrop.run()
 ```
-
