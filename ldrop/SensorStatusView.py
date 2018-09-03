@@ -27,29 +27,25 @@ class StatusView(gtk.DrawingArea):
         # initiate trackstatus loop
         glib.idle_add(self.redraw)
 
+    def __del__(self):
+        pass
+
     def add_model(self, model):
         """Add a model to the view."""
         model.on("play_image", self.on_play_image)
         model.on("play_movie", self.on_play_movie)
-        model.on("data_condition_added", self.on_data_condition_added)
-        # model.on("clear_draw_que", self.on_clear_draw_que)
         model.on("draw_que_updated", self.clear_draw_que)
-        model.on("phase_ended", self.clear_draw_que)
         model.on("add_draw_que", self.add_draw_que)
-        model.on("trial_completed", self.on_trial_completed)
+        model.on("data", self.add_draw_que)
         model.on("metric_threshold_updated", self.on_threshold_updated)
 
     def remove_model(self, model):
         """Add a model to the view."""
         model.remove_listener("play_image", self.on_play_image)
         model.remove_listener("play_movie", self.on_play_movie)
-        model.remove_listener("data_condition_added",
-                              self.on_data_condition_added)
-        # model.remove_listener("clear_draw_que", self.on_clear_draw_que)
         model.remove_listener("draw_que_updated", self.clear_draw_que)
-        model.remove_listener("phase_ended", self.clear_draw_que)
         model.remove_listener("add_draw_que", self.add_draw_que)
-        model.remove_listener("trial_completed", self.on_trial_completed)
+        model.remove_listener("data", self.add_draw_que)
         model.remove_listener("metric_threshold_updated",
                               self.on_threshold_updated)
 
@@ -57,18 +53,6 @@ class StatusView(gtk.DrawingArea):
         """Callback for threshold_updated signal."""
         self.green_thresh = thresholds[1]
         self.yellow_thresh = thresholds[0]
-
-    def on_trial_completed(self, a, b, c, d):
-        """Callback for the trial_completed signal."""
-        self.draw_que = {}
-
-    def on_data_condition_added(self, datacondition):
-        """Callback for data_condition_added signal."""
-        if datacondition["type"] == "aoi":
-            # just put something for the unique identifier
-            key = "wgc_aoi" + str(len(self.draw_que))
-            self.draw_que[key] = {"type": "aoi", "r": 0, "g": 0, "b": 1,
-                                  "o": 1, "aoi": datacondition["aoi"]}
 
     def on_play_image(self, stmnum, aoi):
         """Callback for play_image signal."""
@@ -83,6 +67,8 @@ class StatusView(gtk.DrawingArea):
     def add_draw_que(self, itemid, draw_parameters):
         """Add elements to be drawn on the trackstatus canvas."""
         self.draw_que[itemid] = draw_parameters
+
+        print "JOO"
 
     def clear_draw_que(self):
         """Clear all draw-elements."""

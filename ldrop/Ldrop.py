@@ -47,7 +47,7 @@ class Controller(EventEmitter):
         self.pluginmanager = PluginManager(plugin_locator=DropPluginLocator())
         self.pluginmanager.setPluginPlaces([self.plugindir])
         self.pluginmanager.collectPlugins()
-        self.gui = None
+        self.gui = []
 
         self.experiment_id = None
         self.play_callback = None
@@ -65,7 +65,7 @@ class Controller(EventEmitter):
     def run(self):
         # if no gui to control experiment is present, just start running the
         # experiment
-        if self.gui is None and self.play_callback is not None:
+        if len(self.gui) == 0 and self.play_callback is not None:
             self.play()
     
         ml = glib.MainLoop()
@@ -87,11 +87,11 @@ class Controller(EventEmitter):
 
     def enable_gui(self):
         """ Initialize pygtk-view to be run when mainloop starts """
-        self.gui = LDPV(self, self.savedir)
+        self.gui.append(LDPV(self, self.savedir))
 
     def close_gui(self):
         """ Clear gui reference """
-        self.gui = None
+        self.gui = []
 
     def add_sensor(self, sensor_name):
         """Callback for Add sensor -button."""
@@ -122,8 +122,8 @@ class Controller(EventEmitter):
         """Callback for sensor initialization."""
         self.sensors.append(shandle)
 
-        if self.gui is not None:
-            self.gui.add_sensor(shandle)
+        for g in self.gui:
+            g.add_sensor(shandle)
         self.emit("sensorcount_changed")
 
         # add model to hear calls from sensors, such as data_condition met
@@ -210,12 +210,6 @@ class Controller(EventEmitter):
                    "timestamp": self.timestamp()}
             self.on_tag("tag", tag)
 
-## TODO: communication api sensor->experiment mby as follows->    
-#
-#        for r in self.sensors:
-#            self.exp_view.add_model(r)
-#
-#        self.emit("experiment_started")
 
     def on_experiment_completed(self):
         """Callback for experiment finished."""
@@ -224,13 +218,6 @@ class Controller(EventEmitter):
             self.exp_view.remove_model(r)
         #self.exp_view = None
 
-#    def on_data_condition_added(self, data_condition):
-#        """Callback for data_condition_added. Singal datacond. to sensors."""
-#        if data_condition["type"] == "kb":
-#            self.keyboard_contigency += data_condition["keys"]
-#
-#        for sensor in self.sensors:
-#            sensor.set_data_condition(data_condition)
 
     def on_data(self, dp):
         if self.data_callback is not None:

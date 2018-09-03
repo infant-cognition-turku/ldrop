@@ -249,6 +249,7 @@ class LDPV:
 
     def destroy(self, widget, data=None):
         """Class destroyer callback."""
+        self.trackstatus = None
         self.ctrl.close_gui()
         self.ctrl = None
 
