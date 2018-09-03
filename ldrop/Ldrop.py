@@ -154,8 +154,6 @@ class Controller(EventEmitter):
     def play(self):
         """Start the experiment."""
         # TODO: possibly change the "pipeline" of the drop-involvement in exp
-#        self.play_callback()
-#        glib.idle_add(self.on_experiment_completed)
         glib.idle_add(self.play_callback)
 
     def continue_experiment(self):
@@ -174,8 +172,6 @@ class Controller(EventEmitter):
         """Add a model to listen for."""
         model.on("tag", self.on_tag)
         model.on("data", self.on_data)
-#        model.on("data_condition_added", self.on_data_condition_added)
-#        model.on("data_condition_met", self.continue_experiment)
 
     def timestamp(self):
         """Return a local timestamp in microsecond accuracy."""
@@ -246,7 +242,7 @@ class Controller(EventEmitter):
 
     def __del__(self):
         """Destructor."""
-        print("Exitting Drop.")
+        print("ldrop mainloop closed.")
 
 
 def main():

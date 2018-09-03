@@ -36,7 +36,6 @@ class StatusView(gtk.DrawingArea):
         model.on("play_movie", self.on_play_movie)
         model.on("draw_que_updated", self.clear_draw_que)
         model.on("add_draw_que", self.add_draw_que)
-        model.on("data", self.add_draw_que)
         model.on("metric_threshold_updated", self.on_threshold_updated)
 
     def remove_model(self, model):
@@ -45,7 +44,6 @@ class StatusView(gtk.DrawingArea):
         model.remove_listener("play_movie", self.on_play_movie)
         model.remove_listener("draw_que_updated", self.clear_draw_que)
         model.remove_listener("add_draw_que", self.add_draw_que)
-        model.remove_listener("data", self.add_draw_que)
         model.remove_listener("metric_threshold_updated",
                               self.on_threshold_updated)
 
@@ -67,8 +65,6 @@ class StatusView(gtk.DrawingArea):
     def add_draw_que(self, itemid, draw_parameters):
         """Add elements to be drawn on the trackstatus canvas."""
         self.draw_que[itemid] = draw_parameters
-
-        print "JOO"
 
     def clear_draw_que(self):
         """Clear all draw-elements."""

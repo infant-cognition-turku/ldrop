@@ -131,15 +131,17 @@ class LDPV:
         self.window.show_all()
 
         # Not exactly sure if this is needed or not
-        #gtk.gdk.threads_init()
+        #gtk.gdk.threads_init()        
         self.draw_sensors()
 
     def draw_sensors(self):
         sensors = self.ctrl.get_sensors()
-        
+
         for s in sensors:
             self.add_sensor(s)
+            print("gogo")
             self.trackstatus.add_model(s)
+
 
     def on_error(self, errormsg):
         """Callback for error-signal."""
