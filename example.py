@@ -26,7 +26,6 @@ class Experiment(EventEmitter):
         self.round = 1
         self.stimulus_display_time = 5000
         waittime = 0.5 #s
-
         self.images = ["heart.png"]
 
         # create a window object
@@ -101,15 +100,23 @@ class Experiment(EventEmitter):
 
 # start running here
 exp = Experiment()
+
+# create ldrop controller-instance
 ldrop = Ldrop.Controller()
+
+# use setter-functions to set details of the experiment
 ldrop.set_experiment_id("test")
 ldrop.set_callbacks(exp.start_experiment, exp.on_stop,
                       exp.on_continue, exp.on_data)
+
+# make a subscription to experiment instance on ldrop to receive tags
 #exp.tag_callback = ldrop.on_tag
 ldrop.add_model(exp)
 
 # autoadd mouse sensor if you have the sensor-module available
 ldrop.add_sensor('mouse')
+
+# enable sensor-gui (optional)
 ldrop.enable_gui()
 
 # starts blocking

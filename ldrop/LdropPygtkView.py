@@ -249,7 +249,6 @@ class LDPV:
 
     def destroy(self, widget, data=None):
         """Class destroyer callback."""
-        self.remove_all_listeners()
         self.ctrl.close_gui()
         self.ctrl = None
 
