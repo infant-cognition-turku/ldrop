@@ -116,7 +116,6 @@ class LDPV:
         self.stopbutton.add(image)
         self.stopbutton.connect("clicked", self.on_stopbutton_clicked)
 
-
         # set buttons to the buttonbar
         self.buttonbar.add(self.continuebutton)
         self.buttonbar.add(self.playbutton)
@@ -131,7 +130,7 @@ class LDPV:
         self.window.show_all()
 
         # Not exactly sure if this is needed or not
-        #gtk.gdk.threads_init()        
+        # gtk.gdk.threads_init()
         self.draw_sensors()
 
     def draw_sensors(self):
@@ -139,9 +138,7 @@ class LDPV:
 
         for s in sensors:
             self.add_sensor(s)
-            print("gogo")
             self.trackstatus.add_model(s)
-
 
     def on_error(self, errormsg):
         """Callback for error-signal."""
@@ -177,7 +174,7 @@ class LDPV:
 
         # input additional gui-elements
         for ge in gui_elements:
-            if ge["type"] ==  "button":
+            if ge["type"] == "button":
                 newbutton = gtk.Button(ge["id"])
                 newbutton.connect("clicked", self.sensor_button_callback,
                                   device_id, ge["id"])
@@ -218,7 +215,6 @@ class LDPV:
 
     def on_playbutton_clicked(self, button):
         """Start the experiment or continue paused one."""
-        #debug = self.debugbutton.get_active()
         self.ctrl.play()
 
     def on_continuebutton_clicked(self, button):
@@ -243,8 +239,7 @@ class LDPV:
         # participant id
         id_code = self.ctrl.get_participant_id()
 
-        if id_code is not "": #\
-               # and ((len(self.ctrl.get_sensors()) != 0) or debugmode):
+        if id_code is not "":
             self.playbutton.set_sensitive(True)
         else:
             self.playbutton.set_sensitive(False)

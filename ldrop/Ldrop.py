@@ -57,9 +57,7 @@ class Controller(EventEmitter):
 
         self.participant_id = ""
 
-        ## TESTING glib mainloop on drop
-        ## -> then webserver and a webpage controller interface
-        ## issue: many mainloops cause of server?
+        # TESTING glib mainloop on ldrop (moved from gui)
         glib.timeout_add(50, self.on_refresh)
 
     def run(self):
@@ -67,7 +65,7 @@ class Controller(EventEmitter):
         # experiment
         if len(self.gui) == 0 and self.play_callback is not None:
             self.play()
-    
+
         ml = glib.MainLoop()
         ml.run()
 
@@ -76,10 +74,12 @@ class Controller(EventEmitter):
         glib.timeout_add(50, self.on_refresh)
 
     def set_experiment_id(self, expid):
+        """Experiment id-setter."""
         self.experiment_id = expid
 
     def set_callbacks(self, play_callback, stop_callback,
-                         continue_callback, data_callback):
+                      continue_callback, data_callback):
+        """Experiment side callback-setter."""
         self.play_callback = play_callback
         self.stop_callback = stop_callback
         self.continue_callback = continue_callback
@@ -103,14 +103,15 @@ class Controller(EventEmitter):
                                              self.on_sensor_error)
 
     def get_sensors(self):
-        """Return list of sensors."""
+        """Return list of connected sensors."""
         return self.sensors
 
     def get_sensor_plugins(self):
+        """Return list of available sensors."""
         plugins = self.pluginmanager.getAllPlugins()
         sensornames = []
         for p in plugins:
-            sensornames.append(p.name) #[p.name, p.description]
+            sensornames.append(p.name)
 
         return sensornames
 
@@ -196,7 +197,7 @@ class Controller(EventEmitter):
 
 #        self.tags.append(tag)
         self.emit("log_update", tag.copy())
-        
+
     def on_keypress(self, keyname):
         """Callback for keypress."""
         if keyname in self.keyboard_contigency:
@@ -206,16 +207,15 @@ class Controller(EventEmitter):
                    "timestamp": self.timestamp()}
             self.on_tag("tag", tag)
 
-
     def on_experiment_completed(self):
         """Callback for experiment finished."""
         # clear view references
         for r in self.sensors:
             self.exp_view.remove_model(r)
-        #self.exp_view = None
-
+        # self.exp_view = None
 
     def on_data(self, dp):
+        """Callback for data-signal."""
         if self.data_callback is not None:
             glib.idle_add(self.data_callback, dp)
 

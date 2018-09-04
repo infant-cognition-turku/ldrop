@@ -32,7 +32,7 @@ class Sensor(EventEmitter):
 
     def disconnect(self):
         """Method that is called when sensor is disconnected."""
-        #TODO: integrate to destructor
+        # TODO: integrate to destructor
         self.emit("clear_screen")
         self.remove_all_listeners()
         return False
