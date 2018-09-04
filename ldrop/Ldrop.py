@@ -61,6 +61,7 @@ class Controller(EventEmitter):
         glib.timeout_add(50, self.on_refresh)
 
     def run(self):
+        """Initialize controller start mainloop."""
         # if no gui to control experiment is present, just start running the
         # experiment
         if len(self.gui) == 0 and self.play_callback is not None:
@@ -70,6 +71,7 @@ class Controller(EventEmitter):
         ml.run()
 
     def on_refresh(self):
+        """Refresher loop callback."""
         # here refreshment loop functions
         glib.timeout_add(50, self.on_refresh)
 
@@ -86,11 +88,11 @@ class Controller(EventEmitter):
         self.data_callback = data_callback
 
     def enable_gui(self):
-        """ Initialize pygtk-view to be run when mainloop starts """
+        """Initialize pygtk-view to be run when mainloop starts."""
         self.gui.append(LDPV(self, self.savedir))
 
     def close_gui(self):
-        """ Clear gui reference """
+        """Clear gui reference."""
         self.gui = []
 
     def add_sensor(self, sensor_name):

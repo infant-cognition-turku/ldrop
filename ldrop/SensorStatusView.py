@@ -28,6 +28,7 @@ class StatusView(gtk.DrawingArea):
         glib.idle_add(self.redraw)
 
     def __del__(self):
+        """Destructor."""
         pass
 
     def add_model(self, model):

@@ -134,6 +134,9 @@ class LDPV:
         self.draw_sensors()
 
     def draw_sensors(self):
+        """Draw sensor elements to gui."""
+        # TODO: clear sensor elements first? (if draw_sensors would be rerun
+        # after sensor addition)
         sensors = self.ctrl.get_sensors()
 
         for s in sensors:
@@ -151,7 +154,7 @@ class LDPV:
         self.liststore_status.clear()
 
     def focus_on_gui(self):
-        # set the focus back to experiment controller (in case of a keypress..)
+        """Set focus back to experiment controller (eg. keypress)."""
         self.window.present()
 
     def on_addsensorbutton_clicked(self, button):
