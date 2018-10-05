@@ -1,6 +1,6 @@
 from psychopy import visual, core, event
 from pyee import EventEmitter
-import feedparser
+#import feedparser
 import random
 import os
 import time
@@ -114,7 +114,7 @@ ldrop.set_callbacks(exp.start_experiment, exp.on_stop,
 ldrop.add_model(exp)
 
 # autoadd mouse sensor if you have the sensor-module available
-ldrop.add_sensor('mouse')
+#ldrop.add_sensor('mouse')
 
 # enable sensor-gui (optional)
 ldrop.enable_gui()
