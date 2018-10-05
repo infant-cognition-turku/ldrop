@@ -67,8 +67,8 @@ class Controller(EventEmitter):
         if len(self.gui) == 0 and self.play_callback is not None:
             self.play()
 
-        ml = glib.MainLoop()
-        ml.run()
+        self.ml = glib.MainLoop()
+        self.ml.run()
 
     def on_refresh(self):
         """Refresher loop callback."""
@@ -95,14 +95,21 @@ class Controller(EventEmitter):
         """Clear gui reference."""
         self.gui = []
 
+        # run in what condition
+        self.close()
+
     def add_sensor(self, sensor_name):
         """Callback for Add sensor -button."""
         # TODO: Improve APIs for plugins
         plugin_info = self.pluginmanager.getPluginByName(sensor_name)
-        plugin_info.plugin_object.get_sensor(self.rootdir,
-                                             self.savedir,
-                                             self.on_sensor_created,
-                                             self.on_sensor_error)
+
+        if plugin_info is None:
+            print("Plugin " + sensor_name + " not found")
+        else:
+            plugin_info.plugin_object.get_sensor(self.rootdir,
+                                                 self.savedir,
+                                                 self.on_sensor_created,
+                                                 self.on_sensor_error)
 
     def get_sensors(self):
         """Return list of connected sensors."""
@@ -242,9 +249,12 @@ class Controller(EventEmitter):
 
         self.remove_all_listeners()
 
+        self.ml.quit()
+        print("ldrop mainloop closed.")
+
     def __del__(self):
         """Destructor."""
-        print("ldrop mainloop closed.")
+        print("ldrop instance closed.")
 
 
 def main():

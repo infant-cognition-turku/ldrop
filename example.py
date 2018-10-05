@@ -18,7 +18,6 @@ class Experiment(EventEmitter):
         self.draw_queue = []
 
     def start_experiment(self):
-        
         self.paused = False
 
         # parameters
@@ -77,6 +76,10 @@ class Experiment(EventEmitter):
         for i in self.draw_queue:
             i.draw()
 
+        if self.win is None:
+            # loop quits by itself when window is closed
+            return
+
         self.win.flip()
         glib.timeout_add(50, self.draw)
 
@@ -96,7 +99,12 @@ class Experiment(EventEmitter):
         print("QUIT")
         # cleanup
         self.win.close()
-        core.quit()
+
+        #TODO: is this good solution to fade out draw-loop like this?
+        self.win = None
+
+#       core.quit() seems to kill glib mainloop and pygtk-app
+#        core.quit()
 
 # start running here
 exp = Experiment()
@@ -114,7 +122,7 @@ ldrop.set_callbacks(exp.start_experiment, exp.on_stop,
 ldrop.add_model(exp)
 
 # autoadd mouse sensor if you have the sensor-module available
-#ldrop.add_sensor('mouse')
+ldrop.add_sensor('mouse')
 
 # enable sensor-gui (optional)
 ldrop.enable_gui()
