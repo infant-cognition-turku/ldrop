@@ -132,8 +132,8 @@ class Controller(EventEmitter):
         """Callback for sensor initialization."""
         self.sensors.append(shandle)
 
-        for g in self.gui:
-            g.add_sensor(shandle)
+#        for g in self.gui:
+#            g.add_sensor(shandle)
         self.emit("sensorcount_changed")
 
         # add model to hear calls from sensors, such as data_condition met

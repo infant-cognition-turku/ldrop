@@ -129,19 +129,7 @@ class LDPV:
         self.window.add(self.table)
         self.window.show_all()
 
-        # Not exactly sure if this is needed or not
-        # gtk.gdk.threads_init()
-        self.draw_sensors()
-
-    def draw_sensors(self):
-        """Draw sensor elements to gui."""
-        # TODO: clear sensor elements first? (if draw_sensors would be rerun
-        # after sensor addition)
-        sensors = self.ctrl.get_sensors()
-
-        for s in sensors:
-            self.add_sensor(s)
-            self.trackstatus.add_model(s)
+        self.on_sensors_changed()
 
     def on_error(self, errormsg):
         """Callback for error-signal."""
@@ -193,7 +181,7 @@ class LDPV:
     def remove_sensor(self, button, device_id, hvbox):
         """Callback for the remove_sensor button(s). Parameter:buttonhandle."""
         self.ctrl.remove_sensor(device_id)
-        self.sensors_vbox.remove(hvbox)
+        #self.sensors_vbox.remove(hvbox)
 
     def on_keypress(self, widget, event):
         """Keypress callback-function."""
@@ -213,7 +201,25 @@ class LDPV:
 
     def on_sensors_changed(self):
         """Callback for sensors_changed_signal."""
+
+        # clear sensor-element container
+        for s in self.sensors_vbox:
+            # TODO: the addsensor button should be moved outside vbox so that
+            # this class-specific thing would not be needed
+            if s.__class__ is not gtk.Button:        
+                self.sensors_vbox.remove(s)
+
+        # get sensors
+        sensors = self.ctrl.get_sensors()
+
+        # add each sensor to container
+        for s in sensors:
+            self.add_sensor(s)
+            self.trackstatus.add_model(s)
+
+        # check should the playbutton be open
         self.check_play_conditions()
+
         return False
 
     def on_playbutton_clicked(self, button):
