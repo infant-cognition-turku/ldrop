@@ -156,6 +156,7 @@ class Controller(EventEmitter):
     def set_participant_id(self, pid):
         """Method for setting participant_id."""
         self.participant_id = pid
+        self.emit("participant_id_updated")
 
     def get_participant_id(self):
         """Return participant_id."""

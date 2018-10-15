@@ -16,6 +16,7 @@ class LDPV:
         # view knows the controller function calls
         self.ctrl = ctrl
         self.ctrl.on("sensorcount_changed", self.on_sensors_changed)
+        self.ctrl.on("participant_id_updated", self.on_id_updated)
         self.ctrl.on("log_update", self.on_log_update)
         self.ctrl.on("error", self.on_error)
 
@@ -56,7 +57,7 @@ class LDPV:
 
         self.id_entry = gtk.Entry()
         self.id_entry.set_width_chars(10)
-        self.id_entry.connect("changed", self.on_id_changed)
+        self.id_entry.connect("changed", self.on_id_change)
 
         self.id_entryhbox = gtk.HBox(homogeneous=False, spacing=10)
         self.id_entryhbox.pack_start(self.idlabel, expand=False)
@@ -130,6 +131,7 @@ class LDPV:
         self.window.show_all()
 
         self.on_sensors_changed()
+        self.on_id_updated()
 
     def on_error(self, errormsg):
         """Callback for error-signal."""
@@ -190,9 +192,15 @@ class LDPV:
                        "F10", "F11", "F12"]:
             self.ctrl.on_keypress(keyname)
 
-    def on_id_changed(self, widget):
+    def on_id_change(self, widget):
         """Id-change callback-function."""
         self.ctrl.set_participant_id(widget.get_text())
+
+    def on_id_updated(self):
+        """Callback for signal id updated."""
+        # TODO:should id-code come as a parameter?
+        idcode = self.ctrl.get_participant_id()
+        self.id_entry.set_text(idcode)
         self.check_play_conditions()
 
     def on_gui_action(self, editable):
