@@ -183,6 +183,7 @@ class Controller(EventEmitter):
         """Add a model to listen for."""
         model.on("tag", self.on_tag)
         model.on("data", self.on_data)
+        model.on("close_controller", self.on_close_controller)
 
     def timestamp(self):
         """Return a local timestamp in microsecond accuracy."""
@@ -241,10 +242,22 @@ class Controller(EventEmitter):
             sensor.stop_recording()
         glib.idle_add(callback)
 
+    def message_to_sensor(self, sensortype, msg):
+        """Callback for a message to sensor. Sensor needs to support the msg."""
+        # find the right sensor(s) to forward the message to
+        for sensor in self.sensors:
+            if sensor.get_type == sensortype:
+                sensor.on_message(msg)
+
+    def on_close_controller(self):
+        """Callback for signal close_controller."""
+        glib.idle_add(self.close)
+
     def close(self):
         """Method that closes the drop controller."""
         # disconnect all the sensors from the host
         for sensor in self.sensors:
+            #TODO: this is done on stop_collecting data - unify
             sensor.stop_recording()
             sensor.disconnect()
 

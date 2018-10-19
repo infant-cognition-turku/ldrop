@@ -37,17 +37,21 @@ class Sensor(EventEmitter):
         self.remove_all_listeners()
         return False
 
-    def get_type(self):
-        """Return sensor type."""
-        return self.type
+    def get_control_elements(self):
+        """Return the list of sensors control-elements."""
+        return self.control_elements
 
     def get_sensor_id(self):
         """Return sensor-id-string."""
         return self.sensor_id
 
-    def get_control_elements(self):
-        """Return the list of sensors control-elements."""
-        return self.control_elements
+    def get_type(self):
+        """Return sensor type."""
+        return self.type
+
+    def on_message(self, msg):
+        """Receive message from controller."""
+        return False
 
     def start_recording(self, rootdir, participant_id, savefilename):
         """Method that starts sensor recording."""
