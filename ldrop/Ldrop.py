@@ -184,6 +184,8 @@ class Controller(EventEmitter):
         model.on("tag", self.on_tag)
         model.on("data", self.on_data)
         model.on("close_controller", self.on_close_controller)
+        model.on("start_collecting_data", self.on_start_collecting_data)
+        model.on("stop_collecting_data", self.on_stop_collecting_data)
 
     def timestamp(self):
         """Return a local timestamp in microsecond accuracy."""
@@ -230,17 +232,26 @@ class Controller(EventEmitter):
         if self.data_callback is not None:
             glib.idle_add(self.data_callback, dp)
 
-    def start_collecting_data(self, section_id):
+    def on_start_collecting_data(self):
+        """A callback for start_collecting_data signal."""
+        self.start_collecting_data()
+
+    def on_stop_collecting_data(self):
+        """A callback for stop_collecting_data signal."""
+        self.stop_collecting_data(None)
+
+    def start_collecting_data(self):
         """Function starts data collection on all sensors."""
         for sensor in self.sensors:
             sensor.start_recording(self.savedir, self.participant_id,
-                                   self.experiment_id, section_id)
+                                   self.experiment_id)
 
     def stop_collecting_data(self, callback):
         """Stop data collection on all sensors and run callback."""
         for sensor in self.sensors:
             sensor.stop_recording()
-        glib.idle_add(callback)
+        if callback is not None:
+            glib.idle_add(callback)
 
     def message_to_sensor(self, sensortype, msg):
         """Callback for a message to sensor. Sensor needs to support the msg."""
@@ -269,8 +280,3 @@ class Controller(EventEmitter):
     def __del__(self):
         """Destructor."""
         print("ldrop instance closed.")
-
-
-def main():
-    """Main function for running drop."""
-    DropController()
