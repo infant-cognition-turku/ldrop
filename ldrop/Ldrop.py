@@ -28,17 +28,14 @@ class Controller(EventEmitter):
         ldrop_home = os.path.join(homedir, "Documents", "ldrop_data")
         self.rootdir = ldrop_home
         self.plugindir = os.path.join(ldrop_home, "plugins")
-        self.dependenciesdir = os.path.join(ldrop_home, "dependencies")
         self.savedir = os.path.join(ldrop_home, "recordings")
 
         # check that saving, experiment etc directories are present
         utils.dircheck(self.savedir)
         utils.dircheck(self.plugindir)
-        utils.dircheck(self.dependenciesdir)
 
-        # put the plugins-directory and dependenciesdir to python path
+        # put the plugins-directory
         sys.path.append(self.plugindir)
-        sys.path.append(self.dependenciesdir)
 
         # temporary? keyboard-contigency list
         self.keyboard_contigency = []
