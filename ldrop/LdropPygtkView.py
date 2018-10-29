@@ -183,7 +183,6 @@ class LDPV:
     def remove_sensor(self, button, device_id, hvbox):
         """Callback for the remove_sensor button(s). Parameter:buttonhandle."""
         self.ctrl.remove_sensor(device_id)
-        #self.sensors_vbox.remove(hvbox)
 
     def on_keypress(self, widget, event):
         """Keypress callback-function."""
@@ -209,12 +208,11 @@ class LDPV:
 
     def on_sensors_changed(self):
         """Callback for sensors_changed_signal."""
-
         # clear sensor-element container
         for s in self.sensors_vbox:
             # TODO: the addsensor button should be moved outside vbox so that
             # this class-specific thing would not be needed
-            if s.__class__ is not gtk.Button:        
+            if s.__class__ is not gtk.Button:
                 self.sensors_vbox.remove(s)
 
         # get sensors
@@ -253,7 +251,6 @@ class LDPV:
 
     def check_play_conditions(self):
         """Check all prequisities running experiment met. Activate buttons."""
-        # participant id
         id_code = self.ctrl.get_participant_id()
 
         if id_code is not "":

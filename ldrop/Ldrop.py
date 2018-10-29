@@ -250,7 +250,11 @@ class Controller(EventEmitter):
             glib.idle_add(callback)
 
     def message_to_sensor(self, sensortype, msg):
-        """Callback for a message to sensor. Sensor needs to support the msg."""
+        """
+        Callback for a message to sensor.
+
+        Sensor needs to support the msg.
+        """
         # find the right sensor(s) to forward the message to
         for sensor in self.sensors:
             if sensor.get_type == sensortype:
@@ -264,7 +268,7 @@ class Controller(EventEmitter):
         """Method that closes the drop controller."""
         # disconnect all the sensors from the host
         for sensor in self.sensors:
-            #TODO: this is done on stop_collecting data - unify
+            # TODO: this is done on stop_collecting data - unify
             sensor.stop_recording()
             sensor.disconnect()
 
