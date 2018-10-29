@@ -128,9 +128,6 @@ class Controller(EventEmitter):
     def on_sensor_created(self, shandle):
         """Callback for sensor initialization."""
         self.sensors.append(shandle)
-
-#        for g in self.gui:
-#            g.add_sensor(shandle)
         self.emit("sensorcount_changed")
 
         # add model to hear calls from sensors, such as data_condition met
@@ -162,7 +159,8 @@ class Controller(EventEmitter):
     def play(self):
         """Start the experiment."""
         # TODO: possibly change the "pipeline" of the drop-involvement in exp
-        glib.idle_add(self.play_callback)
+        if self.play_callback is not None:
+            glib.idle_add(self.play_callback)
 
     def continue_experiment(self):
         """Callback for continuebutton click."""
@@ -174,7 +172,8 @@ class Controller(EventEmitter):
 
     def stop(self):
         """Callback for stopbutton click."""
-        self.stop_callback()
+        if self.stop_callback is not None:
+            self.stop_callback()
 
     def add_model(self, model):
         """Add a model to listen for."""
