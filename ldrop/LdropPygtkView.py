@@ -133,24 +133,6 @@ class LDPV:
         self.on_sensors_changed()
         self.on_id_updated()
 
-    def on_error(self, errormsg):
-        """Callback for error-signal."""
-        self.show_message_box("Error: " + errormsg, "Drop error",
-                              ("Ok", gtk.RESPONSE_OK), [None], [None])
-
-    def clear_log(self):
-        """Callback for experiment_started-signal."""
-        # clear information about previous experiments rounds
-        self.liststore_status.clear()
-
-    def focus_on_gui(self):
-        """Set focus back to experiment controller (eg. keypress)."""
-        self.window.present()
-
-    def on_addsensorbutton_clicked(self, button):
-        """Callback for addeeg-button."""
-        self.show_plugin_finder()
-
     def add_sensor(self, shandle):
         """Sensor addition involving gui creation."""
         device_id = shandle.get_sensor_id()
@@ -176,20 +158,46 @@ class LDPV:
         self.sensors_vbox.pack_start(hvbox, expand=False)
         self.window.show_all()
 
-    def sensor_button_callback(self, button, device_id, button_id):
-        """Callback for sensor_button pressed-signal."""
-        self.ctrl.sensor_action(device_id, button_id)
+    def check_play_conditions(self):
+        """Check all prequisities running experiment met. Activate buttons."""
+        id_code = self.ctrl.get_participant_id()
 
-    def remove_sensor(self, button, device_id, hvbox):
-        """Callback for the remove_sensor button(s). Parameter:buttonhandle."""
-        self.ctrl.remove_sensor(device_id)
+        if id_code is not "":
+            self.playbutton.set_sensitive(True)
+        else:
+            self.playbutton.set_sensitive(False)
 
-    def on_keypress(self, widget, event):
-        """Keypress callback-function."""
-        keyname = gtk.gdk.keyval_name(event.keyval)
-        if keyname in ["F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9",
-                       "F10", "F11", "F12"]:
-            self.ctrl.on_keypress(keyname)
+    def clear_log(self):
+        """Callback for experiment_started-signal."""
+        # clear information about previous experiments rounds
+        self.liststore_status.clear()
+
+    def destroy(self, widget, data=None):
+        """Class destroyer callback."""
+        self.trackstatus = None
+        self.ctrl.close_gui()
+        self.ctrl = None
+
+    def focus_on_gui(self):
+        """Set focus back to experiment controller (eg. keypress)."""
+        self.window.present()
+
+    def on_addsensorbutton_clicked(self, button):
+        """Callback for addeeg-button."""
+        self.show_plugin_finder()
+
+    def on_continuebutton_clicked(self, button):
+        """Callback for continuebutton click."""
+        self.ctrl.continue_experiment()
+
+    def on_error(self, errormsg):
+        """Callback for error-signal."""
+        self.show_message_box("Error: " + errormsg, "Drop error",
+                              ("Ok", gtk.RESPONSE_OK), [None], [None])
+
+    def on_gui_action(self, editable):
+        """Callback for change in gui that affects exp start conditions."""
+        self.check_play_conditions()
 
     def on_id_change(self, widget):
         """Id-change callback-function."""
@@ -202,9 +210,25 @@ class LDPV:
         self.id_entry.set_text(idcode)
         self.check_play_conditions()
 
-    def on_gui_action(self, editable):
-        """Callback for change in gui that affects exp start conditions."""
-        self.check_play_conditions()
+    def on_keypress(self, widget, event):
+        """Keypress callback-function."""
+        keyname = gtk.gdk.keyval_name(event.keyval)
+        if keyname in ["F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9",
+                       "F10", "F11", "F12"]:
+            self.ctrl.on_keypress(keyname)
+
+    def on_log_update(self, logentry):
+        """Callback for trial completion during experiment."""
+        # append status value to listview
+        self.liststore_log.append([str(logentry)])
+
+        # hop down to see the last value added
+        adj = self.scrol_tree_status.get_vadjustment()
+        adj.set_value(adj.upper-adj.page_size)
+
+    def on_playbutton_clicked(self, button):
+        """Start the experiment or continue paused one."""
+        self.ctrl.play()
 
     def on_sensors_changed(self):
         """Callback for sensors_changed_signal."""
@@ -228,87 +252,17 @@ class LDPV:
 
         return False
 
-    def on_playbutton_clicked(self, button):
-        """Start the experiment or continue paused one."""
-        self.ctrl.play()
-
-    def on_continuebutton_clicked(self, button):
-        """Callback for continuebutton click."""
-        self.ctrl.continue_experiment()
-
     def on_stopbutton_clicked(self, button):
         """Callback for stopbutton click."""
         self.ctrl.stop()
 
-    def on_log_update(self, logentry):
-        """Callback for trial completion during experiment."""
-        # append status value to listview
-        self.liststore_log.append([str(logentry)])
+    def remove_sensor(self, button, device_id, hvbox):
+        """Callback for the remove_sensor button(s). Parameter:buttonhandle."""
+        self.ctrl.remove_sensor(device_id)
 
-        # hop down to see the last value added
-        adj = self.scrol_tree_status.get_vadjustment()
-        adj.set_value(adj.upper-adj.page_size)
-
-    def check_play_conditions(self):
-        """Check all prequisities running experiment met. Activate buttons."""
-        id_code = self.ctrl.get_participant_id()
-
-        if id_code is not "":
-            self.playbutton.set_sensitive(True)
-        else:
-            self.playbutton.set_sensitive(False)
-
-    def destroy(self, widget, data=None):
-        """Class destroyer callback."""
-        self.trackstatus = None
-        self.ctrl.close_gui()
-        self.ctrl = None
-
-    def text_dialog(self, txt):
-        """
-        Spawn a dialog window with a possibility to put scrollable text.
-
-        parameters:
-        txt[list of strings], each string represents a row of in the dialog.
-        """
-        window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-        window.set_size_request(400, 600)
-
-        scrollable = gtk.ScrolledWindow()
-        scrollable.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
-
-        textarena = gtk.TextView()
-        textbuffer = textarena.get_buffer()
-
-        # generate available tags
-        textbuffer.create_tag("red", background="#ffcccc")
-        textbuffer.create_tag("blue", background="#ccccff")
-        textbuffer.create_tag("h1", size_points=14)
-        textbuffer.create_tag("bold", weight=pango.WEIGHT_BOLD)
-        textbuffer.create_tag("italic", style=pango.STYLE_ITALIC)
-
-        while len(txt) > 0:
-            # get the position of the iter (end)
-            position = textbuffer.get_start_iter()
-
-            txt_raw = txt.pop()
-            if type(txt_raw) is list:
-                # get the latest text-thing
-
-                tag = txt_raw[0]
-                text = " " + txt_raw[1] + '\n'
-
-                # insert text with the tag
-                textbuffer.insert_with_tags_by_name(position, text, tag)
-
-            else:
-                textbuffer.insert(position, " " + txt_raw + "\n")
-
-        textarena.set_editable(False)
-        textarena.set_cursor_visible(False)
-        scrollable.add(textarena)
-        window.add(scrollable)
-        window.show_all()
+    def sensor_button_callback(self, button, device_id, button_id):
+        """Callback for sensor_button pressed-signal."""
+        self.ctrl.sensor_action(device_id, button_id)
 
     def show_message_box(self, message, title="", buttons=("OK",
                          gtk.RESPONSE_OK), follow_up=[None],
@@ -395,3 +349,49 @@ class LDPV:
         plugins = self.ctrl.pluginmanager.getAllPlugins()
         for p in plugins:
             pliststore.append([p.name, p.description])
+
+    def text_dialog(self, txt):
+        """
+        Spawn a dialog window with a possibility to put scrollable text.
+
+        parameters:
+        txt[list of strings], each string represents a row of in the dialog.
+        """
+        window = gtk.Window(gtk.WINDOW_TOPLEVEL)
+        window.set_size_request(400, 600)
+
+        scrollable = gtk.ScrolledWindow()
+        scrollable.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
+
+        textarena = gtk.TextView()
+        textbuffer = textarena.get_buffer()
+
+        # generate available tags
+        textbuffer.create_tag("red", background="#ffcccc")
+        textbuffer.create_tag("blue", background="#ccccff")
+        textbuffer.create_tag("h1", size_points=14)
+        textbuffer.create_tag("bold", weight=pango.WEIGHT_BOLD)
+        textbuffer.create_tag("italic", style=pango.STYLE_ITALIC)
+
+        while len(txt) > 0:
+            # get the position of the iter (end)
+            position = textbuffer.get_start_iter()
+
+            txt_raw = txt.pop()
+            if type(txt_raw) is list:
+                # get the latest text-thing
+
+                tag = txt_raw[0]
+                text = " " + txt_raw[1] + '\n'
+
+                # insert text with the tag
+                textbuffer.insert_with_tags_by_name(position, text, tag)
+
+            else:
+                textbuffer.insert(position, " " + txt_raw + "\n")
+
+        textarena.set_editable(False)
+        textarena.set_cursor_visible(False)
+        scrollable.add(textarena)
+        window.add(scrollable)
+        window.show_all()

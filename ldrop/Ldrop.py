@@ -57,43 +57,13 @@ class Controller(EventEmitter):
         # TESTING glib mainloop on ldrop (moved from gui)
         glib.timeout_add(50, self.on_refresh)
 
-    def run(self):
-        """Initialize controller start mainloop."""
-        # if no gui to control experiment is present, just start running the
-        # experiment
-        if len(self.gui) == 0 and self.play_callback is not None:
-            self.play()
-
-        self.ml = glib.MainLoop()
-        self.ml.run()
-
-    def on_refresh(self):
-        """Refresher loop callback."""
-        # here refreshment loop functions
-        glib.timeout_add(50, self.on_refresh)
-
-    def set_experiment_id(self, expid):
-        """Experiment id-setter."""
-        self.experiment_id = expid
-
-    def set_callbacks(self, play_callback, stop_callback,
-                      continue_callback, data_callback):
-        """Experiment side callback-setter."""
-        self.play_callback = play_callback
-        self.stop_callback = stop_callback
-        self.continue_callback = continue_callback
-        self.data_callback = data_callback
-
-    def enable_gui(self):
-        """Initialize pygtk-view to be run when mainloop starts."""
-        self.gui.append(LDPV(self, self.savedir))
-
-    def close_gui(self):
-        """Clear gui reference."""
-        self.gui = []
-
-        # run in what condition
-        self.close()
+    def add_model(self, model):
+        """Add a model to listen for."""
+        model.on("tag", self.on_tag)
+        model.on("data", self.on_data)
+        model.on("close_controller", self.on_close_controller)
+        model.on("start_collecting_data", self.on_start_collecting_data)
+        model.on("stop_collecting_data", self.on_stop_collecting_data)
 
     def add_sensor(self, sensor_name):
         """Callback for Add sensor -button."""
@@ -108,6 +78,42 @@ class Controller(EventEmitter):
                                                  self.on_sensor_created,
                                                  self.on_sensor_error)
 
+    def close(self):
+        """Method that closes the drop controller."""
+        # disconnect all the sensors from the host
+        for sensor in self.sensors:
+            # TODO: this is done on stop_collecting data - unify
+            sensor.stop_recording()
+            sensor.disconnect()
+
+        self.remove_all_listeners()
+
+        self.ml.quit()
+        print("ldrop mainloop stopped.")
+
+    def close_gui(self):
+        """Clear gui reference."""
+        self.gui = []
+
+        # run in what condition
+        self.close()
+
+    def continue_experiment(self):
+        """Callback for continuebutton click."""
+        for sensor in self.sensors:
+            sensor.clear_data_conditions()
+
+        if self.continue_callback is not None:
+            self.continue_callback()
+
+    def enable_gui(self):
+        """Initialize pygtk-view to be run when mainloop starts."""
+        self.gui.append(LDPV(self, self.savedir))
+
+    def get_participant_id(self):
+        """Return participant_id."""
+        return self.participant_id
+
     def get_sensors(self):
         """Return list of connected sensors."""
         return self.sensors
@@ -121,6 +127,47 @@ class Controller(EventEmitter):
 
         return sensornames
 
+    def message_to_sensor(self, sensortype, msg):
+        """
+        Callback for a message to sensor.
+
+        Sensor needs to support the msg.
+        """
+        # find the right sensor(s) to forward the message to
+        for sensor in self.sensors:
+            if sensor.get_type == sensortype:
+                sensor.on_message(msg)
+
+    def on_close_controller(self):
+        """Callback for signal close_controller."""
+        glib.idle_add(self.close)
+
+    def on_data(self, dp):
+        """Callback for data-signal."""
+        if self.data_callback is not None:
+            glib.idle_add(self.data_callback, dp)
+
+    def on_experiment_completed(self):
+        """Callback for experiment finished."""
+        # clear view references
+        for r in self.sensors:
+            self.exp_view.remove_model(r)
+        # self.exp_view = None
+
+    def on_keypress(self, keyname):
+        """Callback for keypress."""
+        if keyname in self.keyboard_contigency:
+            self.keyboard_contigency = []
+            self.emit("continue")
+            tag = {"id": keyname, "secondary_id": "keypress",
+                   "timestamp": self.timestamp()}
+            self.on_tag("tag", tag)
+
+    def on_refresh(self):
+        """Refresher loop callback."""
+        # here refreshment loop functions
+        glib.timeout_add(50, self.on_refresh)
+
     def on_sensor_error(self, msg):
         """Sensor error-handler."""
         self.emit("error", msg)
@@ -133,59 +180,13 @@ class Controller(EventEmitter):
         # add model to hear calls from sensors, such as data_condition met
         self.add_model(shandle)
 
-    def sensor_action(self, sensor_id, action_id):
-        """Perform action that is listed on sensors control elements."""
-        for sensor in self.sensors:
-            if sensor.get_sensor_id() == sensor_id:
-                sensor.action(action_id)
+    def on_start_collecting_data(self):
+        """A callback for start_collecting_data signal."""
+        self.start_collecting_data()
 
-    def remove_sensor(self, sensor_id):
-        """Disconnect the sensor with the provided sensor_id."""
-        for sensor in self.sensors:
-            if sensor.get_sensor_id() == sensor_id:
-                sensor.disconnect()
-                self.sensors.remove(sensor)
-        self.emit("sensorcount_changed")
-
-    def set_participant_id(self, pid):
-        """Method for setting participant_id."""
-        self.participant_id = pid
-        self.emit("participant_id_updated")
-
-    def get_participant_id(self):
-        """Return participant_id."""
-        return self.participant_id
-
-    def play(self):
-        """Start the experiment."""
-        # TODO: possibly change the "pipeline" of the drop-involvement in exp
-        if self.play_callback is not None:
-            glib.idle_add(self.play_callback)
-
-    def continue_experiment(self):
-        """Callback for continuebutton click."""
-        for sensor in self.sensors:
-            sensor.clear_data_conditions()
-
-        if self.continue_callback is not None:
-            self.continue_callback()
-
-    def stop(self):
-        """Callback for stopbutton click."""
-        if self.stop_callback is not None:
-            self.stop_callback()
-
-    def add_model(self, model):
-        """Add a model to listen for."""
-        model.on("tag", self.on_tag)
-        model.on("data", self.on_data)
-        model.on("close_controller", self.on_close_controller)
-        model.on("start_collecting_data", self.on_start_collecting_data)
-        model.on("stop_collecting_data", self.on_stop_collecting_data)
-
-    def timestamp(self):
-        """Return a local timestamp in microsecond accuracy."""
-        return time.time()
+    def on_stop_collecting_data(self):
+        """A callback for stop_collecting_data signal."""
+        self.stop_collecting_data(None)
 
     def on_tag(self, tag):
         """
@@ -204,43 +205,65 @@ class Controller(EventEmitter):
             # send a copy of the dict to each sensor
             sensor.tag(tag.copy())
 
-#        self.tags.append(tag)
         self.emit("log_update", tag.copy())
 
-    def on_keypress(self, keyname):
-        """Callback for keypress."""
-        if keyname in self.keyboard_contigency:
-            self.keyboard_contigency = []
-            self.emit("continue")
-            tag = {"id": keyname, "secondary_id": "keypress",
-                   "timestamp": self.timestamp()}
-            self.on_tag("tag", tag)
+    def play(self):
+        """Start the experiment."""
+        # TODO: possibly change the "pipeline" of the drop-involvement in exp
+        if self.play_callback is not None:
+            glib.idle_add(self.play_callback)
 
-    def on_experiment_completed(self):
-        """Callback for experiment finished."""
-        # clear view references
-        for r in self.sensors:
-            self.exp_view.remove_model(r)
-        # self.exp_view = None
+    def run(self):
+        """Initialize controller start mainloop."""
+        # if no gui to control experiment is present, just start running the
+        # experiment
+        if len(self.gui) == 0 and self.play_callback is not None:
+            self.play()
 
-    def on_data(self, dp):
-        """Callback for data-signal."""
-        if self.data_callback is not None:
-            glib.idle_add(self.data_callback, dp)
+        self.ml = glib.MainLoop()
+        self.ml.run()
 
-    def on_start_collecting_data(self):
-        """A callback for start_collecting_data signal."""
-        self.start_collecting_data()
+    def remove_sensor(self, sensor_id):
+        """Disconnect the sensor with the provided sensor_id."""
+        for sensor in self.sensors:
+            if sensor.get_sensor_id() == sensor_id:
+                sensor.disconnect()
+                self.sensors.remove(sensor)
+        self.emit("sensorcount_changed")
 
-    def on_stop_collecting_data(self):
-        """A callback for stop_collecting_data signal."""
-        self.stop_collecting_data(None)
+    def set_experiment_id(self, expid):
+        """Experiment id-setter."""
+        self.experiment_id = expid
+
+    def set_callbacks(self, play_callback, stop_callback,
+                      continue_callback, data_callback):
+        """Experiment side callback-setter."""
+        self.play_callback = play_callback
+        self.stop_callback = stop_callback
+        self.continue_callback = continue_callback
+        self.data_callback = data_callback
+
+    def set_participant_id(self, pid):
+        """Method for setting participant_id."""
+        self.participant_id = pid
+        self.emit("participant_id_updated")
+
+    def sensor_action(self, sensor_id, action_id):
+        """Perform action that is listed on sensors control elements."""
+        for sensor in self.sensors:
+            if sensor.get_sensor_id() == sensor_id:
+                sensor.action(action_id)
 
     def start_collecting_data(self):
         """Function starts data collection on all sensors."""
         for sensor in self.sensors:
             sensor.start_recording(self.savedir, self.participant_id,
                                    self.experiment_id)
+
+    def stop(self):
+        """Callback for stopbutton click."""
+        if self.stop_callback is not None:
+            self.stop_callback()
 
     def stop_collecting_data(self, callback):
         """Stop data collection on all sensors and run callback."""
@@ -249,34 +272,10 @@ class Controller(EventEmitter):
         if callback is not None:
             glib.idle_add(callback)
 
-    def message_to_sensor(self, sensortype, msg):
-        """
-        Callback for a message to sensor.
-
-        Sensor needs to support the msg.
-        """
-        # find the right sensor(s) to forward the message to
-        for sensor in self.sensors:
-            if sensor.get_type == sensortype:
-                sensor.on_message(msg)
-
-    def on_close_controller(self):
-        """Callback for signal close_controller."""
-        glib.idle_add(self.close)
-
-    def close(self):
-        """Method that closes the drop controller."""
-        # disconnect all the sensors from the host
-        for sensor in self.sensors:
-            # TODO: this is done on stop_collecting data - unify
-            sensor.stop_recording()
-            sensor.disconnect()
-
-        self.remove_all_listeners()
-
-        self.ml.quit()
-        print("ldrop mainloop closed.")
+    def timestamp(self):
+        """Return a local timestamp in microsecond accuracy."""
+        return time.time()
 
     def __del__(self):
         """Destructor."""
-        print("ldrop instance closed.")
+        print("ldrop instance deleted.")

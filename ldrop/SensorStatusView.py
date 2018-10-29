@@ -31,6 +31,10 @@ class StatusView(gtk.DrawingArea):
         """Destructor."""
         pass
 
+    def add_draw_que(self, itemid, draw_parameters):
+        """Add elements to be drawn on the trackstatus canvas."""
+        self.draw_que[itemid] = draw_parameters
+
     def add_model(self, model):
         """Add a model to the view."""
         model.on("play_image", self.on_play_image)
@@ -38,56 +42,6 @@ class StatusView(gtk.DrawingArea):
         model.on("draw_que_updated", self.clear_draw_que)
         model.on("add_draw_que", self.add_draw_que)
         model.on("metric_threshold_updated", self.on_threshold_updated)
-
-    def remove_model(self, model):
-        """Add a model to the view."""
-        model.remove_listener("play_image", self.on_play_image)
-        model.remove_listener("play_movie", self.on_play_movie)
-        model.remove_listener("draw_que_updated", self.clear_draw_que)
-        model.remove_listener("add_draw_que", self.add_draw_que)
-        model.remove_listener("metric_threshold_updated",
-                              self.on_threshold_updated)
-
-    def on_threshold_updated(self, thresholds):
-        """Callback for threshold_updated signal."""
-        self.green_thresh = thresholds[1]
-        self.yellow_thresh = thresholds[0]
-
-    def on_play_image(self, stmnum, aoi):
-        """Callback for play_image signal."""
-        self.draw_que["maoi"+str(stmnum)] = {"type": "aoi", "r": 0, "g": 1,
-                                             "b": 0, "o": 1, "aoi": aoi}
-
-    def on_play_movie(self, stmnum, aoi):
-        """Callback for play_movie signal."""
-        self.draw_que["iaoi"+str(stmnum)] = {"type": "aoi", "r": 0, "g": 1,
-                                             "b": 0, "o": 1, "aoi": aoi}
-
-    def add_draw_que(self, itemid, draw_parameters):
-        """Add elements to be drawn on the trackstatus canvas."""
-        self.draw_que[itemid] = draw_parameters
-
-    def clear_draw_que(self):
-        """Clear all draw-elements."""
-        self.draw_que = {}
-
-    def remove_draw_que(self, key):
-        """
-        Remove element from the trackstatus canvas.
-
-        Parameter is an id of the
-        element. Reserved word: "all" clears everything from the queue.
-        """
-        if key in self.draw_que:
-            self.draw_que.pop(key)
-
-    def redraw(self):
-        """Callback for the idle_add drawing-loop."""
-        if self.window:
-            alloc = self.get_allocation()
-            rect = gtk.gdk.Rectangle(0, 0, alloc.width, alloc.height)
-            self.window.invalidate_rect(rect, True)
-            self.window.process_updates(True)
 
     def draw(self, ctx):
         """Draw the canvas."""
@@ -171,10 +125,6 @@ class StatusView(gtk.DrawingArea):
 
         glib.timeout_add(self.refresh_interval, self.redraw)
 
-    def stop(self):
-        """Some other views might want to stop loops."""
-        return False
-
     def on_expose(self, widget, event):
         """Callback for expose_event."""
         context = widget.window.cairo_create()
@@ -186,4 +136,54 @@ class StatusView(gtk.DrawingArea):
         context.scale(rect.width, rect.height)
 
         self.draw(context)
+        return False
+
+    def on_play_image(self, stmnum, aoi):
+        """Callback for play_image signal."""
+        self.draw_que["maoi"+str(stmnum)] = {"type": "aoi", "r": 0, "g": 1,
+                                             "b": 0, "o": 1, "aoi": aoi}
+
+    def on_play_movie(self, stmnum, aoi):
+        """Callback for play_movie signal."""
+        self.draw_que["iaoi"+str(stmnum)] = {"type": "aoi", "r": 0, "g": 1,
+                                             "b": 0, "o": 1, "aoi": aoi}
+
+    def on_threshold_updated(self, thresholds):
+        """Callback for threshold_updated signal."""
+        self.green_thresh = thresholds[1]
+        self.yellow_thresh = thresholds[0]
+
+    def clear_draw_que(self):
+        """Clear all draw-elements."""
+        self.draw_que = {}
+
+    def redraw(self):
+        """Callback for the idle_add drawing-loop."""
+        if self.window:
+            alloc = self.get_allocation()
+            rect = gtk.gdk.Rectangle(0, 0, alloc.width, alloc.height)
+            self.window.invalidate_rect(rect, True)
+            self.window.process_updates(True)
+
+    def remove_draw_que(self, key):
+        """
+        Remove element from the trackstatus canvas.
+
+        Parameter is an id of the
+        element. Reserved word: "all" clears everything from the queue.
+        """
+        if key in self.draw_que:
+            self.draw_que.pop(key)
+
+    def remove_model(self, model):
+        """Add a model to the view."""
+        model.remove_listener("play_image", self.on_play_image)
+        model.remove_listener("play_movie", self.on_play_movie)
+        model.remove_listener("draw_que_updated", self.clear_draw_que)
+        model.remove_listener("add_draw_que", self.add_draw_que)
+        model.remove_listener("metric_threshold_updated",
+                              self.on_threshold_updated)
+
+    def stop(self):
+        """Some other views might want to stop loops."""
         return False
