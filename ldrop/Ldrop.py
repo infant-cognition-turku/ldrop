@@ -1,4 +1,4 @@
-"""DropController-class."""
+"""LDrop Controller-class."""
 
 import sys
 import os
@@ -46,7 +46,7 @@ class Controller(EventEmitter):
         self.pluginmanager.collectPlugins()
         self.gui = []
 
-        self.experiment_id = None
+        self.experiment_id = ""
         self.play_callback = None
         self.stop_callback = None
         self.continue_callback = None
@@ -64,6 +64,7 @@ class Controller(EventEmitter):
         model.on("close_controller", self.on_close_controller)
         model.on("start_collecting_data", self.on_start_collecting_data)
         model.on("stop_collecting_data", self.on_stop_collecting_data)
+        model.on("update_experiment_id", self.on_update_experiment_id)
 
     def add_sensor(self, sensor_name):
         """Callback for Add sensor -button."""
@@ -177,6 +178,10 @@ class Controller(EventEmitter):
         # add model to hear calls from sensors, such as data_condition met
         self.add_model(shandle)
 
+    def on_update_experiment_id(self, expid):
+        """Sets the experiment id. Used on sensor data saving."""        
+        self.experiment_id = expid
+
     def on_start_collecting_data(self):
         """A callback for start_collecting_data signal."""
         self.start_collecting_data()
@@ -227,10 +232,6 @@ class Controller(EventEmitter):
                 sensor.disconnect()
                 self.sensors.remove(sensor)
         self.emit("sensorcount_changed")
-
-    def set_experiment_id(self, expid):
-        """Experiment id-setter."""
-        self.experiment_id = expid
 
     def set_callbacks(self, play_callback, stop_callback,
                       continue_callback, data_callback):
