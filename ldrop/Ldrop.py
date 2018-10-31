@@ -55,7 +55,7 @@ class Controller(EventEmitter):
         self.participant_id = ""
 
         # TESTING glib mainloop on ldrop (moved from gui)
-        glib.timeout_add(50, self.on_refresh)
+       # glib.timeout_add(50, self.on_refresh)
 
     def add_model(self, model):
         """Add a model to listen for."""
@@ -100,9 +100,6 @@ class Controller(EventEmitter):
 
     def continue_experiment(self):
         """Callback for continuebutton click."""
-        for sensor in self.sensors:
-            sensor.clear_data_conditions()
-
         if self.continue_callback is not None:
             self.continue_callback()
 
