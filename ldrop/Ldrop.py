@@ -54,11 +54,10 @@ class Controller(EventEmitter):
 
         self.participant_id = ""
 
-        # TESTING glib mainloop on ldrop (moved from gui)
-       # glib.timeout_add(50, self.on_refresh)
-
     def add_model(self, model):
         """Add a model to listen for."""
+        #TODO: currently same add_model for different kinds of emitters
+        # (sensors and experiments), just counting they send different signals
         model.on("tag", self.on_tag)
         model.on("data", self.on_data)
         model.on("close_controller", self.on_close_controller)
@@ -161,11 +160,6 @@ class Controller(EventEmitter):
                    "timestamp": self.timestamp()}
             self.on_tag("tag", tag)
 
-    def on_refresh(self):
-        """Refresher loop callback."""
-        # here refreshment loop functions
-        glib.timeout_add(50, self.on_refresh)
-
     def on_sensor_error(self, msg):
         """Sensor error-handler."""
         self.emit("error", msg)
@@ -178,10 +172,6 @@ class Controller(EventEmitter):
         # add model to hear calls from sensors, such as data_condition met
         self.add_model(shandle)
 
-    def on_update_experiment_id(self, expid):
-        """Sets the experiment id. Used on sensor data saving."""        
-        self.experiment_id = expid
-
     def on_start_collecting_data(self):
         """A callback for start_collecting_data signal."""
         self.start_collecting_data()
@@ -189,6 +179,10 @@ class Controller(EventEmitter):
     def on_stop_collecting_data(self):
         """A callback for stop_collecting_data signal."""
         self.stop_collecting_data(None)
+
+    def on_update_experiment_id(self, expid):
+        """Sets the experiment id. Used on sensor data saving."""        
+        self.experiment_id = expid
 
     def on_tag(self, tag):
         """
@@ -224,6 +218,15 @@ class Controller(EventEmitter):
 
         self.ml = glib.MainLoop()
         self.ml.run()
+
+    def remove_model(self, model):
+        """Remove model listeners."""
+        model.remove_listener("tag", self.on_tag)
+        model.remove_listener("data", self.on_data)
+        model.remove_listener("close_controller", self.on_close_controller)
+        model.remove_listener("start_collecting_data", self.on_start_collecting_data)
+        model.remove_listener("stop_collecting_data", self.on_stop_collecting_data)
+        model.remove_listener("update_experiment_id", self.on_update_experiment_id)
 
     def remove_sensor(self, sensor_id):
         """Disconnect the sensor with the provided sensor_id."""
