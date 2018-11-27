@@ -10,6 +10,15 @@ user a sensor-API to be easily used with their own scripts.
 ldrop is not platform dependend by nature. However we use Linux because python
 is easiest to use on Linux.
 
+### Install instructions
+run the following commands:
+```
+sudo apt-get install python-pip
+sudo apt-get install git
+sudo apt-get install python-gtk2
+pip install git+https://github.com/infant-cognition-tampere/ldrop.git
+```
+
 ### How to use ldrop?
 [API design not final]
 ```
