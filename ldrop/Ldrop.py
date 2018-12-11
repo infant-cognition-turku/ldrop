@@ -74,7 +74,6 @@ class Controller(EventEmitter):
             print("Plugin " + sensor_name + " not found")
         else:
             plugin_info.plugin_object.get_sensor(self.rootdir,
-                                                 self.savedir,
                                                  self.on_sensor_created,
                                                  self.on_sensor_error)
 
@@ -172,9 +171,9 @@ class Controller(EventEmitter):
         # add model to hear calls from sensors, such as data_condition met
         self.add_model(shandle)
 
-    def on_start_collecting_data(self):
+    def on_start_collecting_data(self, savesubdir):
         """A callback for start_collecting_data signal."""
-        self.start_collecting_data()
+        self.start_collecting_data(savesubdir)
 
     def on_stop_collecting_data(self):
         """A callback for stop_collecting_data signal."""
@@ -255,10 +254,11 @@ class Controller(EventEmitter):
             if sensor.get_sensor_id() == sensor_id:
                 sensor.action(action_id)
 
-    def start_collecting_data(self):
+    def start_collecting_data(self, savesubdir):
         """Function starts data collection on all sensors."""
+        savepath = os.path.join(self.savedir, savesubdir)
         for sensor in self.sensors:
-            sensor.start_recording(self.savedir, self.participant_id,
+            sensor.start_recording(savepath, self.participant_id,
                                    self.experiment_id)
 
     def stop(self):
