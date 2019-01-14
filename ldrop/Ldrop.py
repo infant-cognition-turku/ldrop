@@ -46,7 +46,6 @@ class Controller(EventEmitter):
         self.pluginmanager.collectPlugins()
         self.gui = []
 
-        self.experiment_id = ""
         self.play_callback = None
         self.stop_callback = None
         self.continue_callback = None
@@ -63,7 +62,6 @@ class Controller(EventEmitter):
         model.on("close_controller", self.on_close_controller)
         model.on("start_collecting_data", self.on_start_collecting_data)
         model.on("stop_collecting_data", self.on_stop_collecting_data)
-        model.on("update_experiment_id", self.on_update_experiment_id)
 
     def add_sensor(self, sensor_name):
         """Callback for Add sensor -button."""
@@ -171,17 +169,13 @@ class Controller(EventEmitter):
         # add model to hear calls from sensors, such as data_condition met
         self.add_model(shandle)
 
-    def on_start_collecting_data(self, savesubdir):
+    def on_start_collecting_data(self, savesubdir, savefilestring):
         """A callback for start_collecting_data signal."""
-        self.start_collecting_data(savesubdir)
+        self.start_collecting_data(savesubdir, savefilestring)
 
     def on_stop_collecting_data(self):
         """A callback for stop_collecting_data signal."""
         self.stop_collecting_data(None)
-
-    def on_update_experiment_id(self, expid):
-        """Sets the experiment id. Used on sensor data saving."""        
-        self.experiment_id = expid
 
     def on_tag(self, tag):
         """
@@ -225,7 +219,6 @@ class Controller(EventEmitter):
         model.remove_listener("close_controller", self.on_close_controller)
         model.remove_listener("start_collecting_data", self.on_start_collecting_data)
         model.remove_listener("stop_collecting_data", self.on_stop_collecting_data)
-        model.remove_listener("update_experiment_id", self.on_update_experiment_id)
 
     def remove_sensor(self, sensor_id):
         """Disconnect the sensor with the provided sensor_id."""
@@ -254,12 +247,13 @@ class Controller(EventEmitter):
             if sensor.get_sensor_id() == sensor_id:
                 sensor.action(action_id)
 
-    def start_collecting_data(self, savesubdir):
+    def start_collecting_data(self, savesubdir, savefilestring):
         """Function starts data collection on all sensors."""
         savepath = os.path.join(self.savedir, savesubdir)
         for sensor in self.sensors:
-            sensor.start_recording(savepath, self.participant_id,
-                                   self.experiment_id)
+            sensor.start_recording(savepath, savefilestring)
+#            sensor.start_recording(savepath, self.participant_id,
+#                                   self.experiment_id)
 
     def stop(self):
         """Callback for stopbutton click."""
