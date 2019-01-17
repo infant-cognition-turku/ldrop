@@ -62,6 +62,7 @@ class Controller(EventEmitter):
         model.on("close_controller", self.on_close_controller)
         model.on("start_collecting_data", self.on_start_collecting_data)
         model.on("stop_collecting_data", self.on_stop_collecting_data)
+        model.on("log_message", self.on_log_message)
 
     def add_sensor(self, sensor_name):
         """Callback for Add sensor -button."""
@@ -194,7 +195,9 @@ class Controller(EventEmitter):
             # send a copy of the dict to each sensor
             sensor.tag(tag.copy())
 
-        self.emit("log_update", tag.copy())
+    def on_log_message(self, logmsg):
+        """Callback for log_append signal."""
+        self.emit("log_update", logmsg)
 
     def play(self):
         """Start the experiment."""
@@ -219,6 +222,7 @@ class Controller(EventEmitter):
         model.remove_listener("close_controller", self.on_close_controller)
         model.remove_listener("start_collecting_data", self.on_start_collecting_data)
         model.remove_listener("stop_collecting_data", self.on_stop_collecting_data)
+        model.remove_listener("log_message", self.on_log_message)
 
     def remove_sensor(self, sensor_id):
         """Disconnect the sensor with the provided sensor_id."""
