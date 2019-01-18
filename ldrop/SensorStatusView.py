@@ -41,7 +41,6 @@ class StatusView(gtk.DrawingArea):
         model.on("play_movie", self.on_play_movie)
         model.on("draw_que_updated", self.clear_draw_que)
         model.on("add_draw_que", self.add_draw_que)
-        model.on("metric_threshold_updated", self.on_threshold_updated)
 
     def draw(self, ctx):
         """Draw the canvas."""
@@ -100,29 +99,6 @@ class StatusView(gtk.DrawingArea):
                 ctx.show_text(txt)
                 txtstart += 0.05
 
-            elif itype == "metric":
-                values = item["values"]
-
-                if len(values) > 0:
-                    width = 0.3
-                    xincrement = width/len(values)
-                    xstart = 0.01
-                    for v in values:
-
-                        if self.green_thresh <= v:
-                            ctx.set_source_rgba(0, 1, 0, 1)
-                        elif self.yellow_thresh <= v and v < self.green_thresh:
-                            ctx.set_source_rgba(1, 1, 0, 1)
-                        elif 0 <= v and v < self.yellow_thresh:
-                            ctx.set_source_rgba(1, 0, 0, 1)
-                        elif v == -1:
-                            ctx.set_source_rgba(0.5, 0.5, 0.5, 1.0)
-
-                        ctx.rectangle(xstart, txtstart-0.03, xincrement, 0.03)
-                        ctx.fill()
-                        xstart += xincrement
-                    txtstart += 0.05
-
         glib.timeout_add(self.refresh_interval, self.redraw)
 
     def on_expose(self, widget, event):
@@ -147,11 +123,6 @@ class StatusView(gtk.DrawingArea):
         """Callback for play_movie signal."""
         self.draw_que["iaoi"+str(stmnum)] = {"type": "aoi", "r": 0, "g": 1,
                                              "b": 0, "o": 1, "aoi": aoi}
-
-    def on_threshold_updated(self, thresholds):
-        """Callback for threshold_updated signal."""
-        self.green_thresh = thresholds[1]
-        self.yellow_thresh = thresholds[0]
 
     def clear_draw_que(self):
         """Clear all draw-elements."""
@@ -181,8 +152,6 @@ class StatusView(gtk.DrawingArea):
         model.remove_listener("play_movie", self.on_play_movie)
         model.remove_listener("draw_que_updated", self.clear_draw_que)
         model.remove_listener("add_draw_que", self.add_draw_que)
-        model.remove_listener("metric_threshold_updated",
-                              self.on_threshold_updated)
 
     def stop(self):
         """Some other views might want to stop loops."""
