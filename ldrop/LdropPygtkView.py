@@ -36,6 +36,7 @@ class LDPV:
         # log list
         self.liststore_log = gtk.ListStore(str)
         self.treeview_log = gtk.TreeView(self.liststore_log)
+        self.treeview_log.connect("size-allocate", self.on_size_allocate)
 
         self.log_column = gtk.TreeViewColumn("Log")
         self.log_cell = gtk.CellRendererText()
@@ -44,7 +45,7 @@ class LDPV:
         self.log_column.set_attributes(self.log_cell, text=0)
 
         # scrollable container
-        self.scrol_tree_status = gtk.ScrolledWindow()
+        self.scrol_tree_status = gtk.ScrolledWindow(vadjustment = None)
         self.scrol_tree_status.set_policy(gtk.POLICY_NEVER,
                                           gtk.POLICY_AUTOMATIC)
         self.scrol_tree_status.add(self.treeview_log)
@@ -217,14 +218,16 @@ class LDPV:
                        "F10", "F11", "F12"]:
             self.ctrl.on_keypress(keyname)
 
+    def on_size_allocate(self, widget, event, data=None):
+        """Callback for size-allocate signal. Scroll to last element."""
+        # hop down to see the last value added
+        adj = widget.get_vadjustment()
+        adj.set_value(adj.get_upper()-adj.get_page_size())
+
     def on_log_update(self, logentry):
         """Callback for trial completion during experiment."""
         # append status value to listview
         self.liststore_log.append([str(logentry)])
-
-        # hop down to see the last value added
-        adj = self.scrol_tree_status.get_vadjustment()
-        adj.set_value(adj.upper-adj.page_size)
 
     def on_playbutton_clicked(self, button):
         """Start the experiment or continue paused one."""
