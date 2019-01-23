@@ -4,17 +4,17 @@ from pkg_resources import iter_entry_points
 import os.path
 
 
-class DropPluginLocator(PluginFileLocator):
-    """Drop plugin locator."""
+class LdropPluginLocator(PluginFileLocator):
+    """ldrop plugin locator."""
 
     def __init__(self):
         """Constructor."""
-        super(DropPluginLocator, self).__init__()
+        super(LdropPluginLocator, self).__init__()
 
     def locatePlugins(self):
         """Locate plugins."""
         # First get plugins from the superclass.
-        base = super(DropPluginLocator, self).locatePlugins()
+        base = super(LdropPluginLocator, self).locatePlugins()
 
         # Iterate through entry point functions to find plugins
         entrypoints = \

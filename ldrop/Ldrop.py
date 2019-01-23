@@ -8,7 +8,7 @@ import utils
 from pyee import EventEmitter
 from LdropPygtkView import LDPV
 from yapsy.PluginManager import PluginManager
-from plugins import DropPluginLocator
+from plugins import LdropPluginLocator
 
 
 class Controller(EventEmitter):
@@ -41,7 +41,7 @@ class Controller(EventEmitter):
         self.keyboard_contigency = []
 
         # initialize plugin manager
-        self.pluginmanager = PluginManager(plugin_locator=DropPluginLocator())
+        self.pluginmanager = PluginManager(plugin_locator=LdropPluginLocator())
         self.pluginmanager.setPluginPlaces([self.plugindir])
         self.pluginmanager.collectPlugins()
         self.gui = []
