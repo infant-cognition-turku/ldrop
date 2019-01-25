@@ -63,6 +63,7 @@ class Controller(EventEmitter):
         model.on("start_collecting_data", self.on_start_collecting_data)
         model.on("stop_collecting_data", self.on_stop_collecting_data)
         model.on("log_message", self.on_log_message)
+        model.on("query", self.on_query)
 
     def add_sensor(self, sensor_name):
         """Callback for Add sensor -button."""
@@ -158,6 +159,12 @@ class Controller(EventEmitter):
                    "timestamp": self.timestamp()}
             self.on_tag("tag", tag)
 
+    def on_query(self, msg, title, buttons, callbacks, callback_args):
+        if len(self.gui) > 0:
+            for g in self.gui:
+                g.show_message_box(msg, title, buttons, callbacks,
+                                   callback_args)
+
     def on_sensor_error(self, msg):
         """Sensor error-handler."""
         self.emit("error", msg)
@@ -223,6 +230,7 @@ class Controller(EventEmitter):
         model.remove_listener("start_collecting_data", self.on_start_collecting_data)
         model.remove_listener("stop_collecting_data", self.on_stop_collecting_data)
         model.remove_listener("log_message", self.on_log_message)
+        model.remove_listener("query", self.on_query)
 
     def remove_sensor(self, sensor_id):
         """Disconnect the sensor with the provided sensor_id."""
