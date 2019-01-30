@@ -51,18 +51,18 @@ ldrop.run()
 ### API
 Signals between ldrop components are transported through pyee.EventEmitter.emit().
 
-# Signals listened by ldrop controller
-"tag" - sends a tag to all connected sensors with timestamp now [dict]
-"start_recording" - begins recording on all connected sensors [savesubdir, savefilestr]
-"stop_recording" - ends recording on all connected sensors and saves recorded data []
-"query" - invoke a popup question to user [msg, title, (option1, gtk.response, ...), [callback1, ...], [parameter1(/None), ...]]
-"log_message" - appends a string on possible GUI log [str]
+#### Signals listened by ldrop controller
+- "tag" - sends a tag to all connected sensors with timestamp now [dict]
+- "start_recording" - begins recording on all connected sensors [savesubdir, savefilestr]
+- "stop_recording" - ends recording on all connected sensors and saves recorded data []
+- "query" - invoke a popup question to user [msg, title, (option1, gtk.response, ...), [callback1, ...], [parameter1(/None), ...]]
+- "log_message" - appends a string on possible GUI log [str]
 
-# Callbacks required on experiment-file
-on_play - is run when play-button is pressed, Play_callback will run automatically on start if on no gui-mode
-on_stop - is run when stop-button is pressed
-on_continue - is run when continue-button is pressed
-on_data - is run when a data packet arrives from any sensor
+#### Callbacks required on experiment-file
+- on_play - is run when play-button is pressed, Play_callback will run automatically on start if on no gui-mode
+- on_stop - is run when stop-button is pressed
+- on_continue - is run when continue-button is pressed
+- on_data - is run when a data packet arrives from any sensor
 
 ### Example experiment structure
 Dependencies and instructions here are specific to certain ICL experiments.
