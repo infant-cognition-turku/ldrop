@@ -77,7 +77,8 @@ setup(
                       # fix their broken packaging. Newest PsychoPy requires
                       # Mac OS X specific packages on all operating systems
                       # ffs.
-                      'PsychoPy==1.85.3' if platform.system() == 'Linux' \
+                      #'PsychoPy==1.85.3' if platform.system() == 'Linux' \
+                      'PsychoPy' if platform.system() == 'Linux' \
                               else 'PsychoPy',
                       'pyglet',
                       'pillow',
