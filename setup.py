@@ -70,7 +70,8 @@ setup(
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
     # TODO: Add proper dependencies
-    install_requires=['numpy==1.15.4',
+    #install_requires=['numpy==1.15.4',
+    install_requires=['numpy'
                       'scipy',
                       'pyee',
                       # FIXME: Maybe remove this later if PsychoPy developers
