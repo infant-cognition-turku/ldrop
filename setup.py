@@ -71,23 +71,23 @@ setup(
     # https://packaging.python.org/en/latest/requirements.html
     # TODO: Add proper dependencies
     #install_requires=['numpy==1.15.4',
-    install_requires=['numpy'
-                      'scipy',
-                      'pyee',
+    #install_requires=['numpy'
+                      #'scipy',
+                      #'pyee',
                       # FIXME: Maybe remove this later if PsychoPy developers
                       # fix their broken packaging. Newest PsychoPy requires
                       # Mac OS X specific packages on all operating systems
                       # ffs.
                       #'PsychoPy==1.85.3' if platform.system() == 'Linux' \
-                      'PsychoPy' if platform.system() == 'Linux' \
-                              else 'PsychoPy',
-                      'pyglet',
-                      'pillow',
-                      'pygame',
-                      'moviepy',
-                      'yapsy',
-                      'configobj',
-                      'json_tricks'],
+                      #'PsychoPy' if platform.system() == 'Linux' \
+                      #        else 'PsychoPy',
+                      #'pyglet',
+                      #'pillow',
+                      #'pygame',
+                      #'moviepy',
+                      #'yapsy',
+                      #'configobj',
+                      #'json_tricks'],
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,
