@@ -6,9 +6,9 @@ ldrop gui for experiment control                                          |  sti
 <img src="https://github.com/infant-cognition-turku/ldrop/blob/master/gui.png" width="185"> | <img src="https://github.com/infant-cognition-turku/ldrop/blob/master/vis2.gif" width="200">
 
 ### What is ldrop?
-ldrop is an open-source platform for presenting stimuli and collecting time-locked data from sensors (e.g., an eye tracker). ldrop is designed to be open source and modular platform to easily add new modules such as recording devices. ldrop has so far been mostly used for collecting moment-by-moment gaze data from children during picture viewing in various settings.
+ldrop is an open-source platform for presenting stimuli and collecting time-locked data from sensors (e.g., an eye tracker). ldrop is designed to be an open source and modular platform to easily add new modules such as recording devices. ldrop has so far been used for collecting moment-by-moment gaze data from children during picture viewing in various settings.
 
-The figure above shows a setup used in a study conducted in rural areas of Sierra Leone (Leppänen et al., 2022). One of the beneficial features of ldrop is near real-time visualization of the distance of the observer's eyes from the sensor (see animation on the right). This has helped in positioning a person (e.g., a young child) at a correct distance and angle with respect to the eye tracking sensor.
+An example setup used in a field study in Sierra Leone is shown (Leppänen et al., 2022). One of the beneficial features of ldrop is near real-time visualization of the distance of the observer's eyes from the eye tracking sensor (see animation on the right). This helps in positioning a person (e.g., a young child) at a correct distance and angle with respect to the eye tracker.
 
 Reference: Leppänen, J. M., Butcher, J. W., Godbout, C., Stephenson, K., Hendrixson, D. T., Griswold, S., Rogers, B. L., Webb, P., Koroma, A. S., & Manary, M. J. (2022). Assessing infant cognition in field settings using eye-tracking: a pilot cohort trial in Sierra Leone. BMJ open, 12(2), e049783. https://doi.org/10.1136/bmjopen-2021-049783
 
