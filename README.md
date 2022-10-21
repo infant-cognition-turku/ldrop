@@ -3,7 +3,7 @@ Data recording sensor api and gui.
 
 ldrop gui for experiment control                                          |  stimuli & sensors (e.g., eye tracking)
 :------------------------------------------------------------------------:|:-------------------------:
-<img src="https://github.com/infant-cognition-turku/ldrop/blob/master/gui.png" width="200"> | <img src="https://github.com/infant-cognition-turku/ldrop/blob/master/vis2.gif" width="200">
+<img src="https://github.com/infant-cognition-turku/ldrop/blob/master/gui.png" width="185"> | <img src="https://github.com/infant-cognition-turku/ldrop/blob/master/vis2.gif" width="200">
 
 ### What is ldrop?
 ldrop is an open-source platform for projects that aim to a present stimuli on computer screen and collect time-locked data from sensors (such as an eye tracker)during the task. ldrop is designed to be open source and modular platform to easily add new modules such as recording devices. ldrop has been so far used to collect moment-by-moment gaze data from children during picture viewing in various settings.
